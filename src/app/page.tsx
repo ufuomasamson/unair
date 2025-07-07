@@ -73,7 +73,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center">
+      <section className="relative min-h-[70vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8">
         {/* Moving Clouds Background with 8 PNGs */}
         <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
           <Image src="/images/cloud1.png" alt="Cloud 1" layout="fill" objectFit="contain" className="absolute w-64 h-auto opacity-70 animate-cloud-move" style={{ top: '15%', animationDuration: '22s', animationDelay: '0s' }} />
@@ -112,20 +112,19 @@ export default function HomePage() {
             animation: cloud-move 22s linear infinite;
           }
         `}</style>
-        {/* Remove background image, keep only solid color */}
         <div className="absolute inset-0 bg-blue-900/60 z-0"></div>
-        <div className="relative z-20 w-full max-w-6xl mx-auto px-4 flex flex-col lg:flex-row items-center justify-between h-full">
+        <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between h-full px-2 sm:px-4 md:px-8">
           {/* Left: Text */}
-          <div className="w-full lg:w-1/2 text-[#4f1032] text-left flex flex-col justify-center items-start py-8 sm:py-12 lg:py-20">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6">A Lifetime Of Discounts? It's Genius.</h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8">Get rewarded for your travels unlock savings of 10% or more with free flight booker account.</p>
+          <div className="w-full lg:w-1/2 text-[#4f1032] text-center lg:text-left flex flex-col justify-center items-center lg:items-start py-8 sm:py-12 lg:py-20">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight">A Lifetime Of Discounts? It's Genius.</h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-xl">Get rewarded for your travels unlock savings of 10% or more with free flight booker account.</p>
           </div>
           {/* Right: Floating Image */}
           <div className="w-full lg:w-1/2 flex justify-center items-center relative mt-6 sm:mt-8 lg:mt-0 bg-transparent">
             <img
               src="/images/hero-bg.png"
               alt="Flying Hero"
-              className="w-[80%] sm:w-[85%] lg:w-[600px] max-w-none rounded-xl animate-float"
+              className="w-[90%] sm:w-[85%] md:w-[70%] lg:w-[600px] max-w-xs sm:max-w-md md:max-w-lg lg:max-w-none rounded-xl animate-float"
               style={{ animation: 'float 3s ease-in-out infinite', objectFit: 'contain' }}
             />
           </div>
@@ -133,8 +132,8 @@ export default function HomePage() {
       </section>
 
       {/* Floating Flight Booking Form */}
-      <section className="relative -mt-12 sm:-mt-16 lg:-mt-20 z-30 mb-12 sm:mb-16 lg:mb-20">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="relative -mt-12 sm:-mt-16 lg:-mt-20 z-30 mb-12 sm:mb-16 lg:mb-20 px-2 sm:px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-2xl p-4 sm:p-6 lg:p-8">
             <div className="text-center mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#4f1032] mb-2">AIR BOOKING</h2>
@@ -192,8 +191,8 @@ export default function HomePage() {
       </section>
 
       {/* Quick Services */}
-      <section className="py-8 sm:py-12 bg-white">
-        <div className="max-w-6xl mx-auto px-4">
+      <section className="py-8 sm:py-12 bg-white px-2 sm:px-4 md:px-8">
+        <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="text-center p-6 border rounded-lg">
               <h3 className="text-lg font-semibold text-[#4f1032] mb-2">International Flight</h3>

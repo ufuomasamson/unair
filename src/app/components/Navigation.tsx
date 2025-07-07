@@ -121,15 +121,26 @@ export default function Navigation() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#4f1032] flex items-center justify-between px-8 py-4">
+    <nav className="sticky top-0 z-50 bg-[#4f1032] flex flex-wrap items-center justify-between px-4 sm:px-8 py-4">
       <Link href="/" className="text-2xl font-bold text-white tracking-tight">Flight Booker</Link>
+      {/* Currency Switcher - always visible */}
+      <div className="flex items-center gap-2 w-full justify-center mt-2 md:mt-0 md:w-auto md:justify-end order-3 md:order-none">
+        <select
+          onChange={(e) => handleCurrencyChange(e.target.value)}
+          value={currency}
+          className="bg-[#4f1032] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-sm md:text-base w-32 md:w-auto"
+        >
+          <option value="EUR">€ EUR</option>
+          <option value="USD">$ USD</option>
+          <option value="GBP">£ GBP</option>
+        </select>
+      </div>
       <div className="hidden md:flex gap-8 items-center text-base font-medium">
         <Link href="/" className="text-white hover:text-[#cd7e0f] transition">Home</Link>
         <Link href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</Link>
         <Link href="/search" className="text-white hover:text-[#cd7e0f] transition">Flights</Link>
         <Link href="/track" className="text-white hover:text-[#cd7e0f] transition">Track Flight</Link>
         <Link href="/contact" className="text-white hover:text-[#cd7e0f] transition">Contact</Link>
-        
         {user ? (
           <div className="flex items-center gap-4">
             {userRole === "admin" && (
@@ -137,32 +148,25 @@ export default function Navigation() {
                 Admin Dashboard
               </Link>
             )}
-            <select onChange={(e) => handleCurrencyChange(e.target.value)} value={currency} className="bg-[#4f1032] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition">
-              <option value="EUR">€ EUR</option>
-              <option value="USD">$ USD</option>
-              <option value="GBP">£ GBP</option>
-            </select>
-            
             <div className="relative">
               <button onClick={() => setIsUserMenuOpen(!isUserMenuOpen)} className="flex items-center gap-2 text-white font-medium">
                 {user.full_name || user.email}
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
               </button>
-              
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 text-black">
                   <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     Profile
                   </Link>
-            <button
+                  <button
                     onClick={() => {
                       handleSignOut();
                       setIsUserMenuOpen(false);
                     }}
                     className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            >
-              Sign Out
-            </button>
+                  >
+                    Sign Out
+                  </button>
                 </div>
               )}
             </div>
@@ -174,7 +178,7 @@ export default function Navigation() {
           </div>
         )}
       </div>
-      <div className="md:hidden">
+      <div className="md:hidden order-2 flex-1 flex justify-end">
         {/* Mobile menu button placeholder */}
       </div>
     </nav>
