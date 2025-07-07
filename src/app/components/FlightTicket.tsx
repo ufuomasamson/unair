@@ -33,7 +33,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
     <div ref={ref} id="ticket" className="max-w-md mx-auto bg-white shadow-2xl rounded-xl p-6 mt-8 mb-8 border border-gray-200 print:shadow-none print:border print:rounded-none print:p-4">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <div className="text-lg font-bold text-[#4f1032]">{airlineName}</div>
+          <div className="text-lg font-bold" style={{ color: '#4f1032' }}>{airlineName}</div>
           <div className="text-xs text-gray-500">Flight No: {flightNumber}</div>
         </div>
         <img src={airlineLogo} alt="Airline Logo" className="h-12 w-12 object-contain" />
@@ -77,9 +77,9 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
       <div className="flex justify-between items-center mb-4">
         <div>
           <div className="text-xs text-gray-500">Tracking No</div>
-          <div className="font-mono text-sm text-[#4f1032]">{trackingNumber}</div>
+          <div className="font-mono text-sm" style={{ color: '#4f1032' }}>{trackingNumber}</div>
         </div>
-        <div className="bg-[#4f1032] text-white px-3 py-1 rounded-full text-xs font-semibold">CONFIRMED</div>
+        <div className="text-white px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: '#4f1032' }}>CONFIRMED</div>
       </div>
       <div className="text-center text-xs text-gray-500 mt-6 border-t pt-4">
         Please present this ticket at check-in
