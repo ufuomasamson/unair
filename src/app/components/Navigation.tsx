@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/supabaseClient";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,8 +10,10 @@ export default function Navigation() {
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const { currency, setCurrency } = useCurrencyStore();
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Get initial session
@@ -75,6 +77,17 @@ export default function Navigation() {
     return () => subscription.unsubscribe();
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    function handleClickOutside(event: MouseEvent) {
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+        setIsMobileMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isMobileMenuOpen]);
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     router.push("/");
@@ -135,6 +148,7 @@ export default function Navigation() {
           <option value="GBP">£ GBP</option>
         </select>
       </div>
+      {/* Desktop Nav */}
       <div className="hidden md:flex gap-8 items-center text-base font-medium">
         <Link href="/" className="text-white hover:text-[#cd7e0f] transition">Home</Link>
         <Link href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</Link>
@@ -178,9 +192,50 @@ export default function Navigation() {
           </div>
         )}
       </div>
+      {/* Hamburger for mobile */}
       <div className="md:hidden order-2 flex-1 flex justify-end">
-        {/* Mobile menu button placeholder */}
+        <button
+          className="text-white focus:outline-none"
+          aria-label="Open menu"
+          onClick={() => setIsMobileMenuOpen((v) => !v)}
+        >
+          <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
+      {/* Mobile Menu Dropdown */}
+      {isMobileMenuOpen && (
+        <div ref={mobileMenuRef} className="absolute top-full left-0 w-full bg-[#4f1032] shadow-lg z-50 flex flex-col items-center py-4 animate-fade-in">
+          <Link href="/" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
+          <Link href="/about" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
+          <Link href="/search" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Flights</Link>
+          <Link href="/track" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Track Flight</Link>
+          <Link href="/contact" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Contact</Link>
+          {user ? (
+            <>
+              {userRole === "admin" && (
+                <Link href="/admin/dashboard" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Admin Dashboard</Link>
+              )}
+              <Link href="/profile" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Profile</Link>
+              <button
+                onClick={() => {
+                  handleSignOut();
+                  setIsMobileMenuOpen(false);
+                }}
+                className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]"
+              >
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link href="/login" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Login</Link>
+              <Link href="/signup" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Sign Up</Link>
+            </>
+          )}
+        </div>
+      )}
     </nav>
   );
 } 
