@@ -1,4 +1,4 @@
-export async function downloadTicket(ticketRef?: React.RefObject<HTMLDivElement>) {
+export async function downloadTicket(ticketRef?: React.RefObject<HTMLDivElement | null>) {
   const ticket = ticketRef?.current || document.getElementById('ticket');
   if (!ticket) {
     alert('Ticket element not found!');
