@@ -30,58 +30,75 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
   passengerclass,
 }, ref) => {
   return (
-    <div ref={ref} id="ticket" className="max-w-md mx-auto bg-white shadow-2xl rounded-xl p-6 mt-8 mb-8 border border-gray-200 print:shadow-none print:border print:rounded-none print:p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div ref={ref} id="ticket" style={{ 
+      maxWidth: '28rem', 
+      margin: '2rem auto', 
+      backgroundColor: '#ffffff', 
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', 
+      borderRadius: '0.75rem', 
+      padding: '1.5rem', 
+      border: '1px solid #e5e7eb' 
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
         <div>
-          <div className="text-lg font-bold" style={{ color: '#4f1032' }}>{airlineName}</div>
-          <div className="text-xs text-gray-500">Flight No: {flightNumber}</div>
+          <div style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#4f1032' }}>{airlineName}</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Flight No: {flightNumber}</div>
         </div>
-        <img src={airlineLogo} alt="Airline Logo" className="h-12 w-12 object-contain" />
+        <img src={airlineLogo} alt="Airline Logo" style={{ height: '3rem', width: '3rem', objectFit: 'contain' }} />
       </div>
-      <div className="border-t border-b py-4 mb-4 flex flex-col gap-2">
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-700">Passenger</span>
-          <span className="text-gray-900">{passengerName}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-700">Class</span>
-          <span className="text-gray-900">{passengerclass}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-700">Trip</span>
-          <span className="text-gray-900">{trip}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="font-semibold text-gray-700">Tour Type</span>
-          <span className="text-gray-900">{tourtype}</span>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <div className="text-xs text-gray-500">From</div>
-          <div className="font-bold text-gray-900">{departure}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">To</div>
-          <div className="font-bold text-gray-900">{arrival}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">Date</div>
-          <div className="font-bold text-gray-900">{date}</div>
-        </div>
-        <div>
-          <div className="text-xs text-gray-500">Time</div>
-          <div className="font-bold text-gray-900">{time}</div>
+      <div style={{ borderTop: '1px solid #e5e7eb', borderBottom: '1px solid #e5e7eb', padding: '1rem 0', marginBottom: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: '600', color: '#374151' }}>Passenger</span>
+            <span style={{ color: '#111827' }}>{passengerName}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: '600', color: '#374151' }}>Class</span>
+            <span style={{ color: '#111827' }}>{passengerclass}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: '600', color: '#374151' }}>Trip</span>
+            <span style={{ color: '#111827' }}>{trip}</span>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontWeight: '600', color: '#374151' }}>Tour Type</span>
+            <span style={{ color: '#111827' }}>{tourtype}</span>
+          </div>
         </div>
       </div>
-      <div className="flex justify-between items-center mb-4">
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
         <div>
-          <div className="text-xs text-gray-500">Tracking No</div>
-          <div className="font-mono text-sm" style={{ color: '#4f1032' }}>{trackingNumber}</div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>From</div>
+          <div style={{ fontWeight: 'bold', color: '#111827' }}>{departure}</div>
         </div>
-        <div className="text-white px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: '#4f1032' }}>CONFIRMED</div>
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>To</div>
+          <div style={{ fontWeight: 'bold', color: '#111827' }}>{arrival}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Date</div>
+          <div style={{ fontWeight: 'bold', color: '#111827' }}>{date}</div>
+        </div>
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Time</div>
+          <div style={{ fontWeight: 'bold', color: '#111827' }}>{time}</div>
+        </div>
       </div>
-      <div className="text-center text-xs text-gray-500 mt-6 border-t pt-4">
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+        <div>
+          <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>Tracking No</div>
+          <div style={{ fontFamily: 'monospace', fontSize: '0.875rem', color: '#4f1032' }}>{trackingNumber}</div>
+        </div>
+        <div style={{ 
+          backgroundColor: '#4f1032', 
+          color: '#ffffff', 
+          padding: '0.25rem 0.75rem', 
+          borderRadius: '9999px', 
+          fontSize: '0.75rem', 
+          fontWeight: '600' 
+        }}>CONFIRMED</div>
+      </div>
+      <div style={{ textAlign: 'center', fontSize: '0.75rem', color: '#6b7280', marginTop: '1.5rem', borderTop: '1px solid #e5e7eb', paddingTop: '1rem' }}>
         Please present this ticket at check-in
       </div>
     </div>
