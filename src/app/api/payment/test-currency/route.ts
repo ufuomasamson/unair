@@ -127,7 +127,7 @@ export async function POST(request: Request) {
         results.push({
           testCase: testCase.name,
           success: false,
-          error: error.message
+          error: error instanceof Error ? error.message : String(error)
         });
       }
     }
@@ -143,7 +143,7 @@ export async function POST(request: Request) {
     console.error('Currency test error:', error);
     return NextResponse.json({
       success: false,
-      error: error.message || 'Internal server error'
+      error: error instanceof Error ? error.message : String(error)
     }, { status: 500 });
   }
 } 
