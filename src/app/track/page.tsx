@@ -1,9 +1,11 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/supabaseClient";
 import jsPDF from "jspdf";
 import { useCurrencyStore } from "@/lib/currencyManager";
 import { useSearchParams } from "next/navigation";
+import FlightTicket from "@/app/components/FlightTicket";
+import { downloadTicket } from "@/lib/downloadTicket";
 
 export default function TrackFlightPage() {
   const [trackingNumber, setTrackingNumber] = useState("");
@@ -15,6 +17,7 @@ export default function TrackFlightPage() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const { formatPrice } = useCurrencyStore();
   const searchParams = useSearchParams();
+  const ticketRef = useRef<HTMLDivElement>(null);
 
   // Handle URL parameters for payment success/error
   useEffect(() => {
@@ -307,13 +310,30 @@ export default function TrackFlightPage() {
                         {booking.paid ? (
                           <div className="space-y-3">
                             <div className="text-green-600 font-semibold">✓ Your flight is confirmed!</div>
-                            <a
-                              href={booking.ticket_url || "#"}
+                            {/* Render the ticket for PDF generation, but hide it visually */}
+                            <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+                              <FlightTicket
+                                ref={ticketRef}
+                                passengerName={booking.passenger_name}
+                                flightNumber={flight.flight_number}
+                                airlineName={flight.airline?.name || "-"}
+                                airlineLogo={flight.airline?.logo_url || "/globe.svg"}
+                                departure={flight.departure?.city || "-"}
+                                arrival={flight.arrival?.city || "-"}
+                                date={flight.date || "-"}
+                                time={flight.time || "-"}
+                                trackingNumber={flight.tracking_number || booking.id}
+                                trip={flight.trip || "-"}
+                                tourtype={flight.tour_type || "-"}
+                                passengerclass={booking.passenger_class || "Economy"}
+                              />
+                            </div>
+                            <button
                               className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition text-center block"
-                              download
+                              onClick={() => downloadTicket(ticketRef)}
                             >
-                              Download Ticket
-                            </a>
+                              Download Ticket (PDF)
+                            </button>
                           </div>
                         ) : (
                           <div className="space-y-3">
