@@ -1,6 +1,7 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { supabase } from '@/supabaseClient';
 import { useCurrencyStore } from '@/lib/currencyManager';
 
@@ -38,22 +39,22 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
   return (
     <nav className="sticky top-0 z-50 bg-[#4f1032]">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
-        <a href="/" className="text-xl sm:text-2xl font-bold text-white tracking-tight">Flight Booker</a>
+        <Link href="/" className="text-xl sm:text-2xl font-bold text-white tracking-tight">Flight Booker</Link>
         
         {/* Desktop Navigation */}
         <div className="hidden md:flex gap-6 lg:gap-8 items-center text-sm lg:text-base font-medium">
-        <a href="/" className="text-white hover:text-[#cd7e0f] transition">Home</a>
-        <a href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</a>
-        <a href="/search" className="text-white hover:text-[#cd7e0f] transition">Flights</a>
-        <a href="/track" className="text-white hover:text-[#cd7e0f] transition">Track Flight</a>
-        <a href="/contact" className="text-white hover:text-[#cd7e0f] transition">Contact</a>
+        <Link href="/" className="text-white hover:text-[#cd7e0f] transition">Home</Link>
+        <Link href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</Link>
+        <Link href="/search" className="text-white hover:text-[#cd7e0f] transition">Flights</Link>
+        <Link href="/track" className="text-white hover:text-[#cd7e0f] transition">Track Flight</Link>
+        <Link href="/contact" className="text-white hover:text-[#cd7e0f] transition">Contact</Link>
         
         {user ? (
             <div className="flex items-center gap-3 lg:gap-4">
               {userRole === 'admin' && (
-                <a href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition text-sm lg:text-base">
+                <Link href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition text-sm lg:text-base">
                 Admin Dashboard
-              </a>
+              </Link>
             )}
               <select 
                 onChange={(e) => handleCurrencyChange(e.target.value)} 
@@ -76,8 +77,8 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
           </div>
         ) : (
           <div className="flex items-center gap-2">
-              <a href="/login" className="px-3 lg:px-4 py-1 lg:py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-xs lg:text-sm">Login</a>
-              <a href="/signup" className="px-3 lg:px-4 py-1 lg:py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-xs lg:text-sm">Sign Up</a>
+              <Link href="/login" className="px-3 lg:px-4 py-1 lg:py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-xs lg:text-sm">Login</Link>
+              <Link href="/signup" className="px-3 lg:px-4 py-1 lg:py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-xs lg:text-sm">Sign Up</Link>
           </div>
         )}
       </div>
@@ -104,19 +105,19 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
         <div className="md:hidden bg-[#4f1032] border-t border-white/20">
           <div className="px-4 py-4 space-y-4">
             <div className="flex flex-col space-y-3">
-              <a href="/" className="text-white hover:text-[#cd7e0f] transition py-2">Home</a>
-              <a href="/about" className="text-white hover:text-[#cd7e0f] transition py-2">About Us</a>
-              <a href="/search" className="text-white hover:text-[#cd7e0f] transition py-2">Flights</a>
-              <a href="/track" className="text-white hover:text-[#cd7e0f] transition py-2">Track Flight</a>
-              <a href="/contact" className="text-white hover:text-[#cd7e0f] transition py-2">Contact</a>
+              <Link href="/" className="text-white hover:text-[#cd7e0f] transition py-2">Home</Link>
+              <Link href="/about" className="text-white hover:text-[#cd7e0f] transition py-2">About Us</Link>
+              <Link href="/search" className="text-white hover:text-[#cd7e0f] transition py-2">Flights</Link>
+              <Link href="/track" className="text-white hover:text-[#cd7e0f] transition py-2">Track Flight</Link>
+              <Link href="/contact" className="text-white hover:text-[#cd7e0f] transition py-2">Contact</Link>
             </div>
             
             {user ? (
               <div className="space-y-3 pt-4 border-t border-white/20">
                 {userRole === 'admin' && (
-                  <a href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition py-2 block">
+                  <Link href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition py-2 block">
                     Admin Dashboard
-                  </a>
+                  </Link>
                 )}
                 <div className="flex items-center justify-between">
                   <span className="text-white text-sm">Currency:</span>
@@ -142,8 +143,8 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
               </div>
             ) : (
               <div className="flex flex-col space-y-2 pt-4 border-t border-white/20">
-                <a href="/login" className="px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-center text-sm">Login</a>
-                <a href="/signup" className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-center text-sm">Sign Up</a>
+                <Link href="/login" className="px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-center text-sm">Login</Link>
+                <Link href="/signup" className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-center text-sm">Sign Up</Link>
               </div>
             )}
           </div>

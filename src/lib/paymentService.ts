@@ -19,7 +19,7 @@ export interface PaymentData {
 export interface PaymentResponse {
   status: string;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
 }
 
 export class PaymentService {
@@ -32,9 +32,9 @@ export class PaymentService {
 
       if (error) throw error;
 
-      const keys: any = {};
+      const keys: Record<string, string> = {};
       if (data && data.length > 0) {
-        data.forEach((item: any) => {
+        data.forEach((item: { type: string; api_key: string }) => {
           keys[item.type] = item.api_key;
         });
       }

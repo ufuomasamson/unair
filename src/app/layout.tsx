@@ -50,23 +50,8 @@ export default async function RootLayout({
   );
   const { data: { user } } = await supabase.auth.getUser();
 
-  let userRole = null;
-  if (user) {
-    const { data } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single();
-    userRole = data?.role || null;
-  }
-
-  let currencies = null;
-  try {
-    const { data } = await supabase.from('currencies').select('*');
-    currencies = data;
-  } catch (error) {
-    console.error('Error fetching currencies:', error);
-  }
+  // Note: userRole and currencies are fetched but not used in this layout
+  // They are handled by the Navigation component internally
 
   return (
     <html lang="en">

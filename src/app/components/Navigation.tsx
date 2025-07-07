@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useCurrencyStore } from "@/lib/currencyManager";
 
 export default function Navigation() {
@@ -111,7 +112,7 @@ export default function Navigation() {
   if (loading) {
     return (
       <nav className="sticky top-0 z-50 bg-[#4f1032] flex items-center justify-between px-8 py-4">
-        <a href="/" className="text-2xl font-bold text-white tracking-tight">Flight Booker</a>
+        <Link href="/" className="text-2xl font-bold text-white tracking-tight">Flight Booker</Link>
         <div className="hidden md:flex gap-8 items-center text-base font-medium">
           <div className="text-white">Loading...</div>
         </div>
@@ -121,20 +122,20 @@ export default function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 bg-[#4f1032] flex items-center justify-between px-8 py-4">
-      <a href="/" className="text-2xl font-bold text-white tracking-tight">Flight Booker</a>
+      <Link href="/" className="text-2xl font-bold text-white tracking-tight">Flight Booker</Link>
       <div className="hidden md:flex gap-8 items-center text-base font-medium">
-        <a href="/" className="text-white hover:text-[#cd7e0f] transition">Home</a>
-        <a href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</a>
-        <a href="/search" className="text-white hover:text-[#cd7e0f] transition">Flights</a>
-        <a href="/track" className="text-white hover:text-[#cd7e0f] transition">Track Flight</a>
-        <a href="/contact" className="text-white hover:text-[#cd7e0f] transition">Contact</a>
+        <Link href="/" className="text-white hover:text-[#cd7e0f] transition">Home</Link>
+        <Link href="/about" className="text-white hover:text-[#cd7e0f] transition">About Us</Link>
+        <Link href="/search" className="text-white hover:text-[#cd7e0f] transition">Flights</Link>
+        <Link href="/track" className="text-white hover:text-[#cd7e0f] transition">Track Flight</Link>
+        <Link href="/contact" className="text-white hover:text-[#cd7e0f] transition">Contact</Link>
         
         {user ? (
           <div className="flex items-center gap-4">
             {userRole === "admin" && (
-              <a href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition">
+              <Link href="/admin/dashboard" className="text-white hover:text-[#cd7e0f] transition">
                 Admin Dashboard
-              </a>
+              </Link>
             )}
             <select onChange={(e) => handleCurrencyChange(e.target.value)} value={currency} className="bg-[#4f1032] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition">
               <option value="EUR">€ EUR</option>
@@ -150,9 +151,9 @@ export default function Navigation() {
               
               {isUserMenuOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 text-black">
-                  <a href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                  <Link href="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
                     Profile
-                  </a>
+                  </Link>
             <button
                     onClick={() => {
                       handleSignOut();
@@ -168,8 +169,8 @@ export default function Navigation() {
           </div>
         ) : (
           <div className="flex items-center gap-2">
-            <a href="/login" className="ml-4 px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition">Login</a>
-            <a href="/signup" className="ml-2 px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition">Sign Up</a>
+            <Link href="/login" className="ml-4 px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition">Login</Link>
+            <Link href="/signup" className="ml-2 px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition">Sign Up</Link>
           </div>
         )}
       </div>

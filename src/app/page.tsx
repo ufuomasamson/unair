@@ -7,44 +7,15 @@ import Image from "next/image";
 import { useCurrencyStore } from "@/lib/currencyManager";
 
 export default function HomePage() {
-  const [trackingNumber, setTrackingNumber] = useState("");
+  const [trackingNumber] = useState("");
   const [flight, setFlight] = useState<any>(null);
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { formatPrice } = useCurrencyStore();
 
-  const handleTrack = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setFlight(null);
-    setBooking(null);
-    setLoading(true);
-    // Search for flight by tracking number
-    const { data: flightData, error: flightError } = await supabase
-      .from("flights")
-      .select(`*, airline:airlines(*), departure:locations(*), arrival:locations(*)`)
-      .eq("tracking_number", trackingNumber)
-      .single();
-    if (flightError || !flightData) {
-      setError("Flight not found");
-      setLoading(false);
-      return;
-    }
-    setFlight(flightData);
-    // Check if user is logged in and has a booking for this flight
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: bookingData } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("flight_id", flightData.id)
-        .single();
-      if (bookingData) setBooking(bookingData);
-    }
-    setLoading(false);
-  };
+  // Note: handleTrack function is defined but not used in the current UI
+  // It's kept for future implementation
 
   const handleMarkAsPaidAndGenerateTicket = async () => {
     if (!booking || !flight) return;
@@ -72,7 +43,7 @@ export default function HomePage() {
     // 3. Upload PDF to Supabase Storage
     const pdfBlob = doc.output("blob");
     const fileName = `ticket_${booking.id}.pdf`;
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("tickets")
       .upload(fileName, pdfBlob, { upsert: true, contentType: "application/pdf" });
     if (uploadError) {
