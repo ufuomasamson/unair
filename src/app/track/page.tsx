@@ -310,8 +310,8 @@ export default function TrackFlightPage() {
                         {booking.paid ? (
                           <div className="space-y-3">
                             <div className="text-green-600 font-semibold">✓ Your flight is confirmed!</div>
-                            {/* Render the ticket for PDF generation, but hide it visually */}
-                            <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
+                            {/* Render the ticket visibly for PDF generation */}
+                            <div className="my-6">
                               <FlightTicket
                                 ref={ticketRef}
                                 passengerName={booking.passenger_name}
