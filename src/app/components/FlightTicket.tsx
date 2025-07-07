@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface FlightTicketProps {
   passengerName: string;
@@ -15,7 +15,7 @@ interface FlightTicketProps {
   passengerclass: string;
 }
 
-const FlightTicket: React.FC<FlightTicketProps> = ({
+const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
   passengerName,
   flightNumber,
   airlineName,
@@ -28,9 +28,9 @@ const FlightTicket: React.FC<FlightTicketProps> = ({
   trip,
   tourtype,
   passengerclass,
-}) => {
+}, ref) => {
   return (
-    <div id="ticket" className="max-w-md mx-auto bg-white shadow-2xl rounded-xl p-6 mt-8 mb-8 border border-gray-200 print:shadow-none print:border print:rounded-none print:p-4">
+    <div ref={ref} id="ticket" className="max-w-md mx-auto bg-white shadow-2xl rounded-xl p-6 mt-8 mb-8 border border-gray-200 print:shadow-none print:border print:rounded-none print:p-4">
       <div className="flex items-center justify-between mb-4">
         <div>
           <div className="text-lg font-bold text-[#4f1032]">{airlineName}</div>
@@ -86,6 +86,6 @@ const FlightTicket: React.FC<FlightTicketProps> = ({
       </div>
     </div>
   );
-};
+});
 
 export default FlightTicket; 

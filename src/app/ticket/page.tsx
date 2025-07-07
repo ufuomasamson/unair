@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/supabaseClient";
 import FlightTicket from "@/app/components/FlightTicket";
@@ -11,6 +11,7 @@ export default function TicketPage() {
   const [airlineLogo, setAirlineLogo] = useState<string>("");
   const [error, setError] = useState("");
   const router = useRouter();
+  const ticketRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchTicket = async () => {
@@ -58,6 +59,7 @@ export default function TicketPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-8 px-2">
       <FlightTicket
+        ref={ticketRef}
         passengerName={booking.passenger_name}
         flightNumber={booking.flights?.flight_number || "-"}
         airlineName={booking.flights?.airline?.name || "-"}
@@ -72,7 +74,7 @@ export default function TicketPage() {
         passengerclass={booking.passenger_class || "Economy"}
       />
       <button
-        onClick={downloadTicket}
+        onClick={() => downloadTicket(ticketRef)}
         className="mt-4 px-6 py-2 bg-[#4f1032] text-white rounded-lg font-semibold shadow hover:bg-[#6d1847] transition"
       >
         Download Ticket
