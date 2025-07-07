@@ -32,16 +32,13 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
   return (
     <div ref={ref} id="ticket" style={{ 
       width: '100%',
-      maxWidth: '800px',
+      maxWidth: '900px',
       margin: '2rem auto', 
       backgroundColor: '#ffffff', 
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', 
       borderRadius: '1rem', 
       padding: '2rem',
-      border: '1px solid #e5e7eb',
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '1.5rem'
+      border: '1px solid #e5e7eb'
     }}>
       {/* Header with Airline Info */}
       <div style={{ 
@@ -49,7 +46,8 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
         alignItems: 'center', 
         justifyContent: 'space-between',
         paddingBottom: '1.5rem',
-        borderBottom: '2px solid #f3f4f6'
+        borderBottom: '2px solid #f3f4f6',
+        marginBottom: '2rem'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <img src={airlineLogo} alt="Airline Logo" style={{ height: '4rem', width: '4rem', objectFit: 'contain' }} />
@@ -68,62 +66,125 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
         }}>CONFIRMED</div>
       </div>
 
-      {/* Main Content - Horizontal Layout */}
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-        {/* Left Column - Passenger Info */}
-        <div style={{ flex: '1', minWidth: '250px' }}>
-          <div style={{ marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Passenger Information</h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Passenger</span>
-                <span style={{ color: '#111827', fontWeight: '500' }}>{passengerName}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Class</span>
-                <span style={{ color: '#111827', fontWeight: '500' }}>{passengerclass}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Trip</span>
-                <span style={{ color: '#111827', fontWeight: '500' }}>{trip}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: '600', color: '#374151' }}>Tour Type</span>
-                <span style={{ color: '#111827', fontWeight: '500' }}>{tourtype}</span>
-              </div>
-            </div>
+      {/* Route Section */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Route Information</h3>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {/* From Card */}
+          <div style={{ 
+            flex: '1',
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>From</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{departure}</div>
           </div>
           
-          <div>
-            <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Tracking</h3>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#4f1032', fontWeight: '600' }}>{trackingNumber}</div>
+          <div style={{ fontSize: '1.5rem', color: '#4f1032', fontWeight: 'bold' }}>→</div>
+          
+          {/* To Card */}
+          <div style={{ 
+            flex: '1',
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem',
+            textAlign: 'center'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>To</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{arrival}</div>
           </div>
         </div>
+      </div>
 
-        {/* Center Column - Route Info */}
-        <div style={{ flex: '1', minWidth: '250px' }}>
-          <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Route Information</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-            <div style={{ flex: '1', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>From</div>
-              <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{departure}</div>
-            </div>
-            <div style={{ fontSize: '1.5rem', color: '#4f1032', fontWeight: 'bold' }}>→</div>
-            <div style={{ flex: '1', textAlign: 'center' }}>
-              <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem' }}>To</div>
-              <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{arrival}</div>
-            </div>
+      {/* Passenger Information Cards */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Passenger Information</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          {/* Passenger Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Passenger</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{passengerName}</div>
           </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-            <div>
-              <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Date</div>
-              <div style={{ fontWeight: 'bold', color: '#111827' }}>{date}</div>
-            </div>
-            <div>
-              <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Time</div>
-              <div style={{ fontWeight: 'bold', color: '#111827' }}>{time}</div>
-            </div>
+
+          {/* Class Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Class</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{passengerclass}</div>
+          </div>
+
+          {/* Trip Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Trip</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{trip}</div>
+          </div>
+
+          {/* Tour Type Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Tour Type</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{tourtype}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Flight Details Cards */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Flight Details</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+          {/* Date Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Date</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{date}</div>
+          </div>
+
+          {/* Time Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Time</div>
+            <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{time}</div>
+          </div>
+
+          {/* Tracking Card */}
+          <div style={{ 
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '0.75rem',
+            padding: '1rem'
+          }}>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Tracking</div>
+            <div style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#4f1032', fontWeight: '600' }}>{trackingNumber}</div>
           </div>
         </div>
       </div>
