@@ -9,8 +9,8 @@
     }
   },
   "env": {
-    "NEXT_PUBLIC_SUPABASE_URL": "@supabase_url",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "@supabase_anon_key",
-    "NEXT_PUBLIC_BASE_URL": "@base_url"
+    "NEXT_PUBLIC_SUPABASE_URL": "https://vggfsoustawdycqrykfo.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZnZ2Zzb3VzdGF3ZHljcXJ5a2ZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTEwMzM5NjIsImV4cCI6MjA2NjYwOTk2Mn0.PMaW0-IVzQNH7J51XafkJwfUmXy8w3cPs5pswEzTF9Y",
+    "NEXT_PUBLIC_BASE_URL": "https://mazol.vercel.app"
   }
 } 
