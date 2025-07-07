@@ -1,6 +1,8 @@
 "use client";
 import { useState } from 'react';
 import { PaymentService } from '@/services/paymentService';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 interface PaymentButtonProps {
   bookingId: string;
@@ -46,6 +48,26 @@ export default function PaymentButton({
       setIsLoading(false);
     }
   };
+
+  export async function downloadTicket(ticketElement: HTMLElement, fileName = 'flight-ticket.pdf') {
+    if (!ticketElement) return;
+    try {
+      // Use html2canvas to render the ticket element
+      const canvas = await html2canvas(ticketElement, { scale: 2 });
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'pt', format: 'a4' });
+      // Calculate width/height to fit A4
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pageWidth;
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(fileName);
+    } catch (err) {
+      console.error('PDF download error:', err);
+    }
+  }
 
   return (
     <div className={`space-y-4 ${className}`}>
