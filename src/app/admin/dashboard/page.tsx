@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useCurrencyStore } from '@/lib/currencyManager';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/supabaseClient';
 
@@ -18,6 +19,7 @@ export default function AdminDashboard() {
     users: [] as any[],
   });
   const router = useRouter();
+  const { formatPrice } = useCurrencyStore();
 
   useEffect(() => {
     const checkRoleAndFetchData = async () => {
@@ -213,7 +215,7 @@ export default function AdminDashboard() {
               </div>
               <div className="ml-3 sm:ml-4">
                 <p className="text-xs sm:text-sm font-medium text-gray-600">Total Revenue</p>
-                <p className="text-xl sm:text-2xl font-bold text-[#4f1032]">€{(stats.totalRevenue || 0).toFixed(2)}</p>
+                <p className="text-xl sm:text-2xl font-bold text-[#4f1032]">{formatPrice(stats.totalRevenue || 0)}</p>
               </div>
             </div>
           </div>
@@ -227,7 +229,7 @@ export default function AdminDashboard() {
               </div>
               <div className="ml-3 sm:ml-4">
                 <p className="text-xs sm:text-sm font-medium text-gray-600">Total Flight Value</p>
-                <p className="text-xl sm:text-2xl font-bold text-[#4f1032]">€{(stats.totalFlightValue || 0).toFixed(2)}</p>
+                <p className="text-xl sm:text-2xl font-bold text-[#4f1032]">{formatPrice(stats.totalFlightValue || 0)}</p>
               </div>
             </div>
           </div>
