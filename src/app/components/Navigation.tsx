@@ -16,8 +16,11 @@ export default function Navigation() {
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Get initial session
-    const getSession = async () => {
+    let isMounted = true;
+    let refreshTimeout: NodeJS.Timeout | null = null;
+
+    // Helper to fetch and set session/user
+    const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUser(session.user);
@@ -29,7 +32,6 @@ export default function Navigation() {
           .single();
         setUserRole(userData?.role || null);
         setUser((prevUser: any) => ({ ...prevUser, full_name: userData?.full_name || '' }));
-        
         // Try to fetch user currency preference, but don't fail if table doesn't exist
         try {
           const { data: prefData, error } = await supabase
@@ -37,21 +39,29 @@ export default function Navigation() {
             .select('currency_code')
             .eq('user_id', session.user.id)
             .maybeSingle();
-          
           if (error) {
             console.log("Error fetching user preferences:", error);
           } else if (prefData) {
             setCurrency(prefData.currency_code);
           }
         } catch (error) {
-          // Table doesn't exist or other error, use default currency
           console.log("user_preferences table not found or error occurred, using default currency");
         }
+        // Set up session refresh 30 minutes before expiry
+        if (session.expires_at) {
+          const now = Math.floor(Date.now() / 1000);
+          const timeToExpiry = session.expires_at - now;
+          const refreshIn = Math.max((timeToExpiry - 1800) * 1000, 0); // 30 min before expiry
+          if (refreshTimeout) clearTimeout(refreshTimeout);
+          refreshTimeout = setTimeout(() => {
+            supabase.auth.refreshSession().then(fetchSession);
+          }, refreshIn);
+        }
       }
-      setLoading(false);
+      if (isMounted) setLoading(false);
     };
 
-    getSession();
+    fetchSession();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -70,23 +80,39 @@ export default function Navigation() {
           setUser(null);
           setUserRole(null);
         }
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     );
-
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      if (refreshTimeout) clearTimeout(refreshTimeout);
+      subscription.unsubscribe();
+    };
   }, []);
 
+  // Improved mobile menu: always reset on route change and reliably open/close
   useEffect(() => {
-    if (!isMobileMenuOpen) return;
-    function handleClickOutside(event: MouseEvent) {
+    const handleClickOutside = (event: MouseEvent) => {
       if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
         setIsMobileMenuOpen(false);
       }
+    };
+    if (isMobileMenuOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [isMobileMenuOpen]);
+
+  // Close mobile menu on route change (for mobile nav bug)
+  useEffect(() => {
+    const handleRouteChange = () => setIsMobileMenuOpen(false);
+    window.addEventListener('popstate', handleRouteChange);
+    return () => {
+      window.removeEventListener('popstate', handleRouteChange);
+    };
+  }, []);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -238,4 +264,4 @@ export default function Navigation() {
       )}
     </nav>
   );
-} 
+}
