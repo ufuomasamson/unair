@@ -6,30 +6,7 @@ import Image from "next/image";
 
 import { useCurrencyStore } from "@/lib/currencyManager";
 
-// Currency Switcher for homepage
-function CurrencySwitcher() {
-  const { currency, setCurrency } = useCurrencyStore();
-  // Reset the website by reloading when currency changes
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCurrency(e.target.value);
-    window.location.reload();
-  };
-  return (
-    <div className="flex items-center gap-2 justify-center my-4">
-      <label htmlFor="currency-switcher" className="text-base font-medium text-gray-700">Currency:</label>
-      <select
-        id="currency-switcher"
-        onChange={handleChange}
-        value={currency}
-        className="bg-white text-[#4f1032] px-3 py-1 rounded border border-gray-300 hover:border-[#cd7e0f] transition text-sm md:text-base"
-      >
-        <option value="USD">$ USD</option>
-        <option value="EUR">€ EUR</option>
-        <option value="GBP">£ GBP</option>
-      </select>
-    </div>
-  );
-}
+
 
 export default function HomePage() {
   const [trackingNumber] = useState("");

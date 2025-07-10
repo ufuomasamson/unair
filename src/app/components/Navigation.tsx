@@ -135,7 +135,7 @@ export default function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 bg-[#4f1032] flex flex-wrap items-center justify-between px-4 sm:px-8 py-4">
-      <Link href="/" className="text-2xl font-bold text-white tracking-tight">Mazol</Link>
+      <Link href="/" className="text-2xl font-bold text-white tracking-tight">Mano Air</Link>
       {/* Currency Switcher - always visible */}
       <div className="flex items-center gap-2 w-full justify-center mt-2 md:mt-0 md:w-auto md:justify-end order-3 md:order-none">
         <select
