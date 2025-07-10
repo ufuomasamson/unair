@@ -74,8 +74,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Homepage Currency Switcher */}
-      <CurrencySwitcher />
       {/* Hero Section */}
       <section className="relative min-h-[70vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8">
         {/* Moving Clouds Background with 8 PNGs */}
