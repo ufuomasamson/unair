@@ -240,11 +240,11 @@ export default function CreateFlightPage() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price (€) *
+                  Price ($) *
                 </label>
                 <input
                   type="number"
-                  placeholder="Enter price in Euros"
+                  placeholder="Enter price in US Dollars"
                   value={price}
                   onChange={e => setPrice(e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"

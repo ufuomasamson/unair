@@ -147,7 +147,7 @@ export default function CreatedFlightsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Price:</span>
-                  <span className="text-xl font-bold text-[#cd7e0f]">€{selectedFlight.price.toLocaleString()}</span>
+                  <span className="text-xl font-bold text-[#cd7e0f]">${selectedFlight.price.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Trip:</span>

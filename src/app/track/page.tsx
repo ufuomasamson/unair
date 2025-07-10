@@ -96,12 +96,12 @@ export default function TrackFlightPage() {
       return;
     }
     
-      // Use the new v2 payment API with EUR currency
+      // Use the new v2 payment API with USD currency
       const paymentData = {
         bookingId: booking.id,
         userId: user.id,
         amount: flight.price,
-        currency: 'EUR' // Force EUR currency
+        currency: 'USD' // Force USD currency
       };
 
       const response = await fetch('/api/payment/initiate-v2', {

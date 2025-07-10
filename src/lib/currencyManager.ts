@@ -22,9 +22,16 @@ const currencySymbols = {
 };
 
 export const useCurrencyStore = create<CurrencyState>((set, get) => ({
-  currency: 'EUR',
+  currency: typeof window !== 'undefined' && window.localStorage.getItem('currency')
+    ? window.localStorage.getItem('currency') as string
+    : 'USD',
   exchangeRates,
-  setCurrency: (currency) => set({ currency }),
+  setCurrency: (currency) => {
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('currency', currency);
+    }
+    set({ currency });
+  },
   formatPrice: (price: number) => {
     const { currency } = get();
     const rate = exchangeRates[currency as keyof typeof exchangeRates] || 1;
