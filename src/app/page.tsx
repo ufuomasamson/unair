@@ -1,12 +1,10 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/supabaseClient";
 import jsPDF from "jspdf";
 import Image from "next/image";
 
 import { useCurrencyStore } from "@/lib/currencyManager";
-
-
 
 export default function HomePage() {
   const [trackingNumber] = useState("");
@@ -14,7 +12,89 @@ export default function HomePage() {
   const [booking, setBooking] = useState<any>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [payLoading, setPayLoading] = useState(false);
   const { formatPrice } = useCurrencyStore();
+
+  const [flights, setFlights] = useState<any[]>([]);
+  const [locations, setLocations] = useState<any[]>([]);
+  const [airlines, setAirlines] = useState<any[]>([]);
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [fromSuggestions, setFromSuggestions] = useState<any[]>([]);
+  const [toSuggestions, setToSuggestions] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  useEffect(() => {
+    // Fetch all flights (basic, no joins)
+    supabase.from("flights").select("*")
+      .then(({ data }) => setFlights(data || []));
+    // Fetch all locations
+    supabase.from("locations").select("*")
+      .then(({ data }) => setLocations(data || []));
+    // Fetch all airlines
+    supabase.from("airlines").select("*")
+      .then(({ data }) => setAirlines(data || []));
+  }, []);
+
+  // Autocomplete logic for FROM
+  useEffect(() => {
+    if (from.length < 3) {
+      setFromSuggestions([]);
+      return;
+    }
+    const match = locations.filter(loc =>
+      loc.city.toLowerCase().includes(from.toLowerCase()) ||
+      loc.country.toLowerCase().includes(from.toLowerCase())
+    );
+    setFromSuggestions(match);
+  }, [from, locations]);
+
+  // Autocomplete logic for TO
+  useEffect(() => {
+    if (to.length < 3) {
+      setToSuggestions([]);
+      return;
+    }
+    const match = locations.filter(loc =>
+      loc.city.toLowerCase().includes(to.toLowerCase()) ||
+      loc.country.toLowerCase().includes(to.toLowerCase())
+    );
+    setToSuggestions(match);
+  }, [to, locations]);
+
+  // Search flights
+  const handleSearchFlights = () => {
+    setSearchLoading(true);
+    setSearchResults([]);
+    setTimeout(() => {
+      const fromValue = from.trim().toLowerCase();
+      const toValue = to.trim().toLowerCase();
+      console.log('Flights:', flights);
+      console.log('Search FROM:', fromValue, 'TO:', toValue);
+      const filtered = flights.filter(flight => {
+        const depLoc = locations.find(loc => loc.id === flight.departure_location_id);
+        const arrLoc = locations.find(loc => loc.id === flight.arrival_location_id);
+        const depCity = depLoc?.city?.toLowerCase() || "";
+        const depCountry = depLoc?.country?.toLowerCase() || "";
+        const arrCity = arrLoc?.city?.toLowerCase() || "";
+        const arrCountry = arrLoc?.country?.toLowerCase() || "";
+        const depMatch = fromValue ? (depCity.includes(fromValue) || depCountry.includes(fromValue)) : true;
+        const arrMatch = toValue ? (arrCity.includes(toValue) || arrCountry.includes(toValue)) : true;
+        return depMatch && arrMatch;
+      }).map(flight => {
+        // Attach location objects for display
+        return {
+          ...flight,
+          departure: locations.find(loc => loc.id === flight.departure_location_id),
+          arrival: locations.find(loc => loc.id === flight.arrival_location_id)
+        };
+      });
+      console.log('Filtered Results:', filtered);
+      setSearchResults(filtered);
+      setSearchLoading(false);
+    }, 800); // Simulate loading
+  };
 
   // Note: handleTrack function is defined but not used in the current UI
   // It's kept for future implementation
@@ -140,23 +220,32 @@ export default function HomePage() {
             <div className="text-center mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#4f1032] mb-2">AIR BOOKING</h2>
             </div>
-            
             {/* Flight Booking Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">FROM</label>
-                <input type="text" placeholder="Departure City" className="w-full p-3 border rounded text-gray-900" />
+                <input type="text" value={from} onChange={e => setFrom(e.target.value)} placeholder="Departure City" className="w-full p-3 border rounded text-gray-900" autoComplete="off" />
+                {fromSuggestions.length > 0 && (
+                  <ul className="absolute left-0 right-0 bg-white border rounded shadow z-10 mt-1 max-h-40 overflow-y-auto">
+                    {fromSuggestions.map(loc => (
+                      <li key={loc.id} className="px-3 py-2 cursor-pointer hover:bg-gray-100" onClick={() => { setFrom(loc.city); setFromSuggestions([]); }}>{loc.city}, {loc.country}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">TO</label>
-                <input type="text" placeholder="Arrival City" className="w-full p-3 border rounded text-gray-900" />
+                <input type="text" value={to} onChange={e => setTo(e.target.value)} placeholder="Arrival City" className="w-full p-3 border rounded text-gray-900" autoComplete="off" />
+                {toSuggestions.length > 0 && (
+                  <ul className="absolute left-0 right-0 bg-white border rounded shadow z-10 mt-1 max-h-40 overflow-y-auto">
+                    {toSuggestions.map(loc => (
+                      <li key={loc.id} className="px-3 py-2 cursor-pointer hover:bg-gray-100" onClick={() => { setTo(loc.city); setToSuggestions([]); }}>{loc.city}, {loc.country}</li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Depart</label>
-                <input type="date" className="w-full p-3 border rounded text-gray-900" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Return</label>
                 <input type="date" className="w-full p-3 border rounded text-gray-900" />
               </div>
             </div>
@@ -185,9 +274,28 @@ export default function HomePage() {
                 </select>
               </div>
             </div>
-            <button className="w-full bg-[#cd7e0f] text-white py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#cd7e0f]/90 transition text-sm sm:text-lg">
-              Search Flights
+            <button className="w-full bg-[#cd7e0f] text-white py-3 sm:py-4 rounded-lg font-semibold hover:bg-[#cd7e0f]/90 transition text-sm sm:text-lg" onClick={handleSearchFlights}>
+              {searchLoading ? "Searching For Flight..." : "Search Flights"}
             </button>
+      {/* Search Results */}
+      {searchResults.length > 0 && (
+        <div className="mt-8">
+          <h3 className="text-lg font-bold mb-4 text-[#4f1032]">Available Flights</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {searchResults.map(flight => (
+              <div key={flight.id} className="bg-gray-50 rounded-lg shadow p-6">
+                <div className="font-bold text-xl mb-2">{flight.airline?.name || "Airline"}</div>
+                <div className="mb-1">Flight No: <span className="font-mono">{flight.flight_number}</span></div>
+                <div className="mb-1">From: {flight.departure?.city}, {flight.departure?.country}</div>
+                <div className="mb-1">To: {flight.arrival?.city}, {flight.arrival?.country}</div>
+                <div className="mb-1">Date: {flight.date} | Time: {flight.time}</div>
+                <div className="mb-2 font-semibold text-[#cd7e0f]">{formatPrice(flight.price)}</div>
+                <button className="bg-[#cd7e0f] text-white px-4 py-2 rounded hover:bg-[#cd7e0f]/90 mt-2" onClick={() => setFlight(flight)}>Book Now</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
           </div>
         </div>
       </section>
@@ -516,19 +624,26 @@ export default function HomePage() {
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
             <h2 className="text-2xl font-bold mb-4 text-[#4f1032]">Flight Details</h2>
             <div className="flex items-center gap-4 mb-4">
-              {flight.airline?.logo_url ? (
-                <img src={flight.airline.logo_url} alt={flight.airline.name} className="w-16 h-16 object-contain rounded" />
-              ) : (
-                <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded">Logo</div>
-              )}
+              {/* Airline logo lookup by airline_id */}
+              {(() => {
+                const airlineObj = airlines.find(a => a.id === flight.airline_id);
+                if (airlineObj?.logo_url) {
+                  return <img src={airlineObj.logo_url} alt={airlineObj.name} className="w-16 h-16 object-contain rounded" />;
+                }
+                return <div className="w-16 h-16 bg-gray-200 flex items-center justify-center rounded">Logo</div>;
+              })()}
               <div>
-                <div className="font-semibold text-lg">{flight.airline?.name || "Airline"}</div>
+                <div className="font-semibold text-lg">{(() => {
+                  const airlineObj = airlines.find(a => a.id === flight.airline_id);
+                  return airlineObj?.name || "Airline";
+                })()}</div>
                 <div>Flight No: <span className="font-mono">{flight.flight_number}</span></div>
               </div>
             </div>
             <div className="mb-2">Route: {flight.departure?.city}, {flight.departure?.country} → {flight.arrival?.city}, {flight.arrival?.country}</div>
             <div className="mb-2">Date: {flight.date} | Time: {flight.time}</div>
             <div className="mb-4 font-semibold text-[#cd7e0f]">₦{formatPrice(flight.price)}</div>
+            {/* Book This Flight button logic */}
             {booking ? (
               booking.paid ? (
                 <a
@@ -539,18 +654,85 @@ export default function HomePage() {
                   Download Ticket
                 </a>
               ) : (
-                <button
-                  className="bg-[#cd7e0f] text-white px-4 py-2 rounded hover:bg-[#cd7e0f]/90"
-                  onClick={handleMarkAsPaidAndGenerateTicket}
-                >
-                  Mark as Paid & Generate Ticket
-                </button>
+                <div className="flex flex-col gap-2">
+                  <button
+                    className="bg-[#cd7e0f] text-white px-4 py-2 rounded hover:bg-[#cd7e0f]/90"
+                    onClick={handleMarkAsPaidAndGenerateTicket}
+                  >
+                    Mark as Paid & Generate Ticket
+                  </button>
+                  <button
+                    className={`bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-2 ${payLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+                    disabled={payLoading}
+                    onClick={async () => {
+                      setPayLoading(true);
+                      // Prepare payment data
+                      const paymentData = {
+                        tx_ref: `booking_${booking.id}_${Date.now()}`,
+                        amount: flight.price,
+                        currency: "NGN", // or your currency
+                        payment_options: "card",
+                        redirect_url: `${window.location.origin}/api/payment/verify?booking_id=${booking.id}`,
+                        customer: {
+                          email: booking.passenger_name,
+                          name: booking.passenger_name
+                        },
+                        customizations: {
+                          title: "Flight Payment",
+                          description: `Payment for flight ${flight.flight_number}`,
+                          logo: airlines.find(a => a.id === flight.airline_id)?.logo_url || ""
+                        }
+                      };
+                      // Redirect to Flutterwave
+                      const flutterwavePublicKey = "YOUR_FLUTTERWAVE_PUBLIC_KEY"; // Replace with your key
+                      // Build payment URL
+                      const payUrl = `https://checkout.flutterwave.com/v3/hosted/pay?public_key=${flutterwavePublicKey}&tx_ref=${paymentData.tx_ref}&amount=${paymentData.amount}&currency=${paymentData.currency}&redirect_url=${encodeURIComponent(paymentData.redirect_url)}&customer[email]=${encodeURIComponent(paymentData.customer.email)}&customer[name]=${encodeURIComponent(paymentData.customer.name)}&customizations[title]=${encodeURIComponent(paymentData.customizations.title)}&customizations[description]=${encodeURIComponent(paymentData.customizations.description)}&customizations[logo]=${encodeURIComponent(paymentData.customizations.logo)}`;
+                      window.location.href = payUrl;
+                    }}
+                  >
+                    {payLoading ? "Processing..." : "Pay Now"}
+                  </button>
+                </div>
               )
             ) : (
-              <div className="text-gray-500">Login and book this flight to pay and download your ticket.</div>
+              <div className="flex flex-col gap-2">
+                <button
+                  className="bg-[#cd7e0f] text-white px-4 py-2 rounded hover:bg-[#cd7e0f]/90"
+                  onClick={async () => {
+                    setError("");
+                    const { data } = await supabase.auth.getUser();
+                    if (!data?.user) {
+                      setError("You must sign up or log in before you can book this flight.");
+                      return;
+                    }
+                    // Create booking in Supabase
+                    const { error: bookingError, data: bookingData } = await supabase
+                      .from("bookings")
+                      .insert([
+                        {
+                          flight_id: flight.id,
+                          passenger_name: data.user.email,
+                          paid: false,
+                          created_at: new Date().toISOString(),
+                        }
+                      ])
+                      .select()
+                      .single();
+                    if (bookingError) {
+                      setError("Failed to create booking. Please try again.");
+                      return;
+                    }
+                    setBooking(bookingData);
+                  }}
+                >
+                  Book This Flight
+                </button>
+                {error && <div className="text-red-500 text-sm">{error}</div>}
+                <div className="text-gray-500">Login and book this flight to pay and download your ticket.</div>
+              </div>
             )}
             <button 
-              onClick={() => setFlight(null)} 
+              onClick={() => { setFlight(null); setBooking(null); setError(""); }} 
               className="mt-4 w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
             >
               Close
