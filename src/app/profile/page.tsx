@@ -1,33 +1,36 @@
-import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { createServerSupabaseClient } from '@/lib/supabaseClient';
 
 export default async function Profile() {
   const cookieStore = await cookies();
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
-          }
-        },
-      },
+  const supabase = createServerSupabaseClient();
+  
+  // Try to get the user from Supabase using server client
+  const { data: { session } } = await supabase.auth.getSession();
+  
+  // If there's no session, try to get user data from a cookie as fallback
+  let userData = null;
+  
+  if (!session?.user) {
+    const userCookie = cookieStore.get('user');
+    if (userCookie && userCookie.value) {
+      try {
+        userData = JSON.parse(userCookie.value);
+      } catch (error) {
+        console.error('Failed to parse user cookie:', error);
+      }
     }
-  );
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  } else {
+    // User is authenticated with Supabase
+    userData = {
+      id: session.user.id,
+      email: session.user.email,
+      name: session.user.user_metadata?.name || session.user.email?.split('@')[0]
+    };
+  }
+  
+  // If there's no user data, redirect to login (handled by client-side)
+  const user = userData;
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">

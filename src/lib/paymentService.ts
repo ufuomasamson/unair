@@ -1,4 +1,3 @@
-import { supabase } from '@/supabaseClient';
 
 export interface PaymentData {
   amount: number;
@@ -25,20 +24,10 @@ export interface PaymentResponse {
 export class PaymentService {
   private static async getFlutterwaveKeys() {
     try {
-      const { data, error } = await supabase
-        .from('payment_gateways')
-        .select('*')
-        .eq('name', 'flutterwave');
-
-      if (error) throw error;
-
-      const keys: Record<string, string> = {};
-      if (data && data.length > 0) {
-        data.forEach((item: { type: string; api_key: string }) => {
-          keys[item.type] = item.api_key;
-        });
-      }
-
+      // Fetch payment gateway keys from Appwrite via API route
+      const response = await fetch('/api/payment-keys?gateway=flutterwave');
+      if (!response.ok) throw new Error('Payment gateway not configured');
+      const keys = await response.json();
       return keys;
     } catch (error) {
       console.error('Error fetching Flutterwave keys:', error);

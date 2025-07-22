@@ -1,13 +1,17 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/supabaseClient";
+// TODO: Replace Supabase logic with MySQL or custom authentication
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useCurrencyStore } from "@/lib/currencyManager";
 
-export default function Navigation() {
-  const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
+type NavigationProps = {
+  user: any;
+  userRole: string | null;
+  currencies: { code: string; symbol: string }[];
+};
+
+export default function Navigation({ user, userRole, currencies }: NavigationProps) {
   const [loading, setLoading] = useState(true);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,76 +23,10 @@ export default function Navigation() {
     let isMounted = true;
     let refreshTimeout: NodeJS.Timeout | null = null;
 
-    // Helper to fetch and set session/user
-    const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        setUser(session.user);
-        // Fetch user role and full name
-        const { data: userData } = await supabase
-          .from("users")
-          .select("role, full_name")
-          .eq("id", session.user.id)
-          .single();
-        setUserRole(userData?.role || null);
-        setUser((prevUser: any) => ({ ...prevUser, full_name: userData?.full_name || '' }));
-        // Try to fetch user currency preference, but don't fail if table doesn't exist
-        try {
-          const { data: prefData, error } = await supabase
-            .from('user_preferences')
-            .select('currency_code')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-          if (error) {
-            console.log("Error fetching user preferences:", error);
-          } else if (prefData) {
-            setCurrency(prefData.currency_code);
-          }
-        } catch (error) {
-          console.log("user_preferences table not found or error occurred, using default currency");
-        }
-        // Set up session refresh 30 minutes before expiry
-        if (session.expires_at) {
-          const now = Math.floor(Date.now() / 1000);
-          const timeToExpiry = session.expires_at - now;
-          const refreshIn = Math.max((timeToExpiry - 1800) * 1000, 0); // 30 min before expiry
-          if (refreshTimeout) clearTimeout(refreshTimeout);
-          refreshTimeout = setTimeout(() => {
-            supabase.auth.refreshSession().then(fetchSession);
-          }, refreshIn);
-        }
-      }
-      if (isMounted) setLoading(false);
-    };
-
-    fetchSession();
-
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (session?.user) {
-          setUser(session.user);
-          // Fetch user role and full name
-          const { data: userData } = await supabase
-            .from("users")
-            .select("role, full_name")
-            .eq("id", session.user.id)
-            .single();
-          setUserRole(userData?.role || null);
-          setUser((prevUser: any) => ({ ...prevUser, full_name: userData?.full_name || '' }));
-        } else {
-          setUser(null);
-          setUserRole(null);
-        }
-        if (isMounted) setLoading(false);
-      }
-    );
-    return () => {
-      isMounted = false;
-      if (refreshTimeout) clearTimeout(refreshTimeout);
-      subscription.unsubscribe();
-    };
+    // TODO: Implement session/user fetch and auth state change using MySQL or custom auth
+    setLoading(false);
   }, []);
+        // Removed setUser and setUserRole logic, user and userRole are now props
 
   // Improved mobile menu: always reset on route change and reliably open/close
   useEffect(() => {
@@ -115,37 +53,31 @@ export default function Navigation() {
   }, []);
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
+    try {
+      // Call logout API to clear cookie
+      const response = await fetch("/api/logout", { 
+        method: "POST",
+        headers: { "Content-Type": "application/json" }
+      });
+      
+      if (!response.ok) {
+        console.error("Logout failed:", await response.text());
+      } else {
+        console.log("Logout successful");
+      }
+      
+      // Reload page so server components re-read cookies and Navigation updates
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error during logout:", error);
+      // Still redirect to home page even if logout fails
+      window.location.href = "/";
+    }
   };
 
   const handleCurrencyChange = async (newCurrency: string) => {
     setCurrency(newCurrency);
-    if (user) {
-      try {
-        // Try to update first, if no record exists, create one
-        const { error: updateError } = await supabase
-          .from('user_preferences')
-          .update({ currency_code: newCurrency })
-          .eq('user_id', user.id);
-        
-        if (updateError && updateError.code === 'PGRST116') {
-          // No rows found, create a new preference record
-          const { error: insertError } = await supabase
-            .from('user_preferences')
-            .insert({ user_id: user.id, currency_code: newCurrency });
-          
-          if (insertError) {
-            console.log("Error creating user preference:", insertError);
-          }
-        } else if (updateError) {
-          console.log("Error updating user preference:", updateError);
-        }
-      } catch (error) {
-        // Table doesn't exist or other error, that's okay
-        console.log("user_preferences table not found or error occurred, currency change not persisted");
-      }
-    }
+    // TODO: Update user preferences in MySQL or custom API
   };
 
   if (loading) {
@@ -161,7 +93,7 @@ export default function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 bg-[#4f1032] flex flex-wrap items-center justify-between px-4 sm:px-8 py-4">
-      <Link href="/" className="text-2xl font-bold text-white tracking-tight">Mano Air</Link>
+      <Link href="/" className="text-2xl font-bold text-white tracking-tight">United Airline</Link>
       {/* Currency Switcher - always visible */}
       <div className="flex items-center gap-2 w-full justify-center mt-2 md:mt-0 md:w-auto md:justify-end order-3 md:order-none">
         <select

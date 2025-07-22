@@ -1,13 +1,146 @@
+
 "use client";
 import { useState, useEffect, useRef } from "react";
-import { supabase } from "@/supabaseClient";
-import jsPDF from "jspdf";
+import Modal from "../components/Modal";
+import FlightTicket from "../components/FlightTicket";
+import { downloadTicket } from "@/lib/downloadTicket";
 import { useCurrencyStore } from "@/lib/currencyManager";
 import { useSearchParams } from "next/navigation";
-import FlightTicket from "@/app/components/FlightTicket";
-import { downloadTicket } from "@/lib/downloadTicket";
 
 export default function TrackFlightPage() {
+  // Payment modal state and handlers must be inside the component
+  const [wallets, setWallets] = useState<any[]>([]);
+  const [showWalletsModal, setShowWalletsModal] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<any>(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentAmount, setPaymentAmount] = useState("");
+  const [proofFile, setProofFile] = useState<File|null>(null);
+  const [submittingProof, setSubmittingProof] = useState(false);
+
+  // Fetch wallets only when needed
+  const handleOpenWalletsModal = async () => {
+    setShowWalletsModal(true);
+    if (wallets.length === 0) {
+      try {
+        const res = await fetch("/api/crypto-wallets");
+        const data = await res.json();
+        setWallets(data);
+      } catch {}
+    }
+  };
+
+  const handleSelectWallet = (wallet: any) => {
+    setSelectedWallet(wallet);
+    setShowWalletsModal(false);
+    setShowPaymentModal(true);
+  };
+
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false);
+    setSelectedWallet(null);
+    setPaymentAmount("");
+    setProofFile(null);
+  };
+
+  const handleProofFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setProofFile(e.target.files[0]);
+    }
+  };
+
+  // Submit payment proof
+  const handleSubmitProof = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('[DEBUG] handleSubmitProof booking:', booking);
+    if (!selectedWallet || !paymentAmount || !proofFile || !booking || !booking.id) {
+      setError("Booking not found or invalid. Please book the flight first.");
+      return;
+    }
+    setSubmittingProof(true);
+    // Get user info from cookie
+    const userCookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    let userObj = null;
+    if (userCookie) {
+      userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+    }
+    
+    if (!userObj || !userObj.id) {
+      setError("User information not found. Please log in again.");
+      setSubmittingProof(false);
+      return;
+    }
+    
+    const formData = new FormData();
+    formData.append("booking_id", booking.id);
+    formData.append("amount", paymentAmount);
+    formData.append("payment_proof", proofFile); // Renamed from proof to payment_proof
+    formData.append("payment_method", "crypto"); // Add payment method
+    formData.append("currency", "USD"); // Add default currency
+    formData.append("user_id", userObj.id); // Add user ID
+    formData.append("user_email", userObj.email || ""); // Add user email if available
+    
+    console.log('[DEBUG] Submitting payment proof with data:', {
+      booking_id: booking.id,
+      amount: paymentAmount,
+      payment_method: "crypto",
+      user_id: userObj.id
+    });
+    
+    try {
+      const res = await fetch("/api/payments", {
+        method: "POST",
+        body: formData
+      });
+      if (res.ok) {
+        handleClosePaymentModal();
+        setShowWalletsModal(false);
+        setSuccess("Payment proof submitted successfully!");
+        // Always re-fetch booking from backend to get latest status
+        // Use current flight.id and user id from cookie
+        try {
+          const userCookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+          let userObj = null;
+          if (userCookie) {
+            userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          }
+          if (userObj && flight && flight.id) {
+            const bookingRes = await fetch(`/api/bookings?user_id=${userObj.id}&flight_id=${flight.id}`);
+            let bookingData = await bookingRes.json();
+            let bookingObj = null;
+            if (Array.isArray(bookingData)) {
+              bookingObj = bookingData.length > 0 ? bookingData[0] : null;
+            } else if (bookingData && typeof bookingData === 'object') {
+              bookingObj = bookingData;
+            }
+            console.log('[DEBUG] After proof upload, fetched booking:', bookingObj);
+            if (bookingRes.ok && bookingObj) {
+              // Update the booking status to "awaiting_approval" after payment submission
+              if (bookingObj.status !== 'approved') {
+                const updateBookingRes = await fetch(`/api/bookings/${bookingObj.id}`, {
+                  method: 'PATCH',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ status: 'awaiting_approval' })
+                });
+                if (updateBookingRes.ok) {
+                  bookingObj.status = 'awaiting_approval';
+                }
+              }
+              setBooking(bookingObj);
+              console.log('[DEBUG] After proof upload, passenger_name:', bookingObj.passenger_name);
+            }
+          }
+        } catch (err) {
+          console.log('[DEBUG] Error fetching booking after proof upload:', err);
+        }
+      } else {
+        setError("Failed to submit proof. Try again.");
+      }
+    } catch (err) {
+      setError("Failed to submit proof. Try again.");
+      console.log('[DEBUG] Error in handleSubmitProof:', err);
+    }
+    setSubmittingProof(false);
+  };
   const [trackingNumber, setTrackingNumber] = useState("");
   const [flight, setFlight] = useState<any>(null);
   const [booking, setBooking] = useState<any>(null);
@@ -15,26 +148,38 @@ export default function TrackFlightPage() {
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [paymentLoading, setPaymentLoading] = useState(false);
-  const { formatPrice } = useCurrencyStore();
   const searchParams = useSearchParams();
-  const ticketRef = useRef<HTMLDivElement>(null);
-
-  // Handle URL parameters for payment success/error
+  const formatPrice = useCurrencyStore((s) => s.formatPrice);
+  // DEBUG LOGGING
   useEffect(() => {
-    const urlError = searchParams.get('error');
-    const urlSuccess = searchParams.get('success');
-    const txRef = searchParams.get('tx_ref');
-
-    if (urlError) {
-      setError(urlError);
-    }
-    if (urlSuccess) {
-      setSuccess(urlSuccess);
-      if (txRef) {
-        setTrackingNumber(txRef);
-        // Auto-track the flight
-        handleTrackFlight(txRef);
+    if (flight) {
+      // Log the full flight object and key fields
+      console.log('[DEBUG] Flight object:', flight);
+      console.log('[DEBUG] Airline:', flight.airline);
+      console.log('[DEBUG] Departure:', flight.departure);
+      console.log('[DEBUG] Arrival:', flight.arrival);
+      console.log('[DEBUG] Tracking Number:', flight.tracking_number);
+      console.log('[DEBUG] Raw Price:', flight.price);
+      try {
+        const formatted = formatPrice(flight.price);
+        console.log('[DEBUG] Formatted Price:', formatted);
+      } catch (e) {
+        console.log('[DEBUG] formatPrice error:', e);
       }
+    }
+    if (booking) {
+      // Log the full booking object and key fields
+      console.log('[DEBUG] Booking object:', booking);
+      console.log('[DEBUG] Passenger Name:', booking.passenger_name);
+      console.log('[DEBUG] Paid:', booking.paid);
+    }
+  }, [flight, booking]);
+
+  useEffect(() => {
+    // Optionally auto-track if tracking number is in query params
+    const trackNum = searchParams.get("tracking_number");
+    if (trackNum) {
+      handleTrackFlight(trackNum);
     }
   }, [searchParams]);
 
@@ -43,35 +188,67 @@ export default function TrackFlightPage() {
     setFlight(null);
     setBooking(null);
     setLoading(true);
-    
-    const { data: flightData, error: flightError } = await supabase
-      .from("flights")
-      .select(`
-        *,
-        airline:airlines(*),
-        departure:locations!flights_departure_location_id_fkey(city, country),
-        arrival:locations!flights_arrival_location_id_fkey(city, country)
-      `)
-      .eq("tracking_number", trackNumber)
-      .single();
-    
-    if (flightError || !flightData) {
+    try {
+      console.log('Tracking flight with number:', trackNumber);
+      // Fetch flight info from API
+      const response = await fetch(`/api/flights?tracking_number=${trackNumber}`);
+      const flightData = await response.json();
+      console.log('Flight data response:', flightData);
+      
+      if (!response.ok || !flightData) {
+        setError("Flight not found with this tracking number");
+        setLoading(false);
+        return;
+      }
+      // Map nested fields to UI-compatible format
+      const mappedFlight = {
+        ...flightData,
+        airline: flightData.airline ? {
+          name: flightData.airline.name,
+          logo_url: flightData.airline.logo_url
+        } : undefined,
+        departure: flightData.departure_location ? {
+          city: flightData.departure_location.city,
+          country: flightData.departure_location.country
+        } : undefined,
+        arrival: flightData.arrival_location ? {
+          city: flightData.arrival_location.city,
+          country: flightData.arrival_location.country
+        } : undefined
+      };
+      setFlight(mappedFlight);
+      // Fetch booking info for logged-in user (from cookie)
+      const userCookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+      if (userCookie) {
+        try {
+          const userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+          const bookingRes = await fetch(`/api/bookings?user_id=${userObj.id}&flight_id=${flightData.id}`);
+          let bookingData = await bookingRes.json();
+          // Always set booking to an object or null, never an array
+          let bookingObj = null;
+          if (Array.isArray(bookingData)) {
+            bookingObj = bookingData.length > 0 ? bookingData[0] : null;
+          } else if (bookingData && typeof bookingData === 'object') {
+            bookingObj = bookingData;
+          }
+          // Only set booking if it matches the current flight
+          if (bookingRes.ok && bookingObj && bookingObj.flight_id === flightData.id) {
+            setBooking(bookingObj);
+            console.log('[DEBUG] setBooking (object):', bookingObj);
+          } else {
+            setBooking(null);
+            console.log('[DEBUG] setBooking: null (no booking found for this flight)');
+          }
+        } catch (err) {
+          setBooking(null);
+          console.log('[DEBUG] setBooking: null (error)', err);
+        }
+      } else {
+        setBooking(null);
+        console.log('[DEBUG] setBooking: null (no user cookie)');
+      }
+    } catch (err) {
       setError("Flight not found with this tracking number");
-      setLoading(false);
-      return;
-    }
-    
-    setFlight(flightData);
-    
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      const { data: bookingData } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("flight_id", flightData.id)
-        .single();
-      if (bookingData) setBooking(bookingData);
     }
     setLoading(false);
   };
@@ -81,105 +258,73 @@ export default function TrackFlightPage() {
     await handleTrackFlight(trackingNumber);
   };
 
-  const handleMarkAsPaidAndGenerateTicket = async () => {
-    if (!booking || !flight) return;
-    
-    setPaymentLoading(true);
-    setError("");
-    
-    try {
-      // Get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setError("You must be logged in to make payment");
-        setPaymentLoading(false);
-      return;
-    }
-    
-      // Use the new v2 payment API with USD currency
-      const paymentData = {
-        bookingId: booking.id,
-        userId: user.id,
-        amount: flight.price,
-        currency: 'USD' // Force USD currency
-      };
-
-      const response = await fetch('/api/payment/initiate-v2', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(paymentData),
-      });
-
-      const result = await response.json();
-
-      if (result.success && result.data?.payment_url) {
-        // Redirect to Flutterwave payment page
-        window.location.href = result.data.payment_url;
-      } else {
-        setError(result.error || 'Failed to initialize payment');
-        setPaymentLoading(false);
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      setError('Payment initialization failed');
-      setPaymentLoading(false);
-    }
-  };
+  // Payment and proof upload logic will be handled via UI and admin approval
 
   const handleBookFlight = async () => {
     if (!flight) return;
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
+    // Get user from cookie
+    const userCookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!userCookie) {
       setError("You must be logged in to book a flight.");
       return;
     }
-
-    // Use full_name from user_metadata if available, otherwise fallback to email or N/A
-    let passengerName = user.user_metadata?.full_name || user.email || "N/A";
-
+    let userObj;
+    try {
+      userObj = JSON.parse(decodeURIComponent(userCookie.split('=')[1]));
+    } catch {
+      setError("Invalid user session. Please log in again.");
+      return;
+    }
+    // Use passenger name from the tracked flight if available, otherwise fallback to user info
+    let passengerName = flight.passenger_name || userObj.full_name || userObj.name || userObj.email || "N/A";
+    console.log('[DEBUG] handleBookFlight userObj:', userObj);
+    console.log('[DEBUG] handleBookFlight passengerName:', passengerName);
     // Check if booking already exists
-    const { data: existingBooking, error: existingBookingError } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("flight_id", flight.id)
-      .single();
-    if (existingBooking) {
-      setBooking(existingBooking);
+    const bookingRes = await fetch(`/api/bookings?user_id=${userObj.id}&flight_id=${flight.id}`);
+    let existingBooking = await bookingRes.json();
+    let bookingObj = null;
+    if (Array.isArray(existingBooking)) {
+      bookingObj = existingBooking.length > 0 ? existingBooking[0] : null;
+    } else if (existingBooking && typeof existingBooking === 'object') {
+      bookingObj = existingBooking;
+    }
+    // Only set booking if it matches the current flight
+    if (bookingRes.ok && bookingObj && bookingObj.flight_id === flight.id) {
+      setBooking(bookingObj);
       setError("");
       return;
     }
-
-    // Generate transaction reference
-    const txRef = `FLW-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-    const { data, error } = await supabase.from("bookings").insert([
-      {
-        user_id: user.id,
+    setBooking(null); // No valid booking for this flight
+    // Use ISO format for Supabase timestamps
+    const createdAt = new Date().toISOString();
+    // Create booking
+    const res = await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id: userObj.id,
         flight_id: flight.id,
         passenger_name: passengerName,
         paid: false,
-        tx_ref: txRef,
-      },
-    ]);
-
-    if (error) {
+        created_at: createdAt
+      })
+    });
+    if (!res.ok) {
       setError("Failed to book flight.");
     } else {
-      // Refresh booking info
-      const { data: bookingData } = await supabase
-        .from("bookings")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("flight_id", flight.id)
-        .single();
-      if (bookingData) setBooking(bookingData);
+      let bookingData = await res.json();
+      let newBookingObj = null;
+      if (Array.isArray(bookingData)) {
+        newBookingObj = bookingData.length > 0 ? bookingData[0] : null;
+      } else if (bookingData && typeof bookingData === 'object') {
+        newBookingObj = bookingData;
+      }
+      setBooking(newBookingObj);
       setError("");
     }
   };
 
+  const ticketRef = useRef<HTMLDivElement>(null);
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Hero Section */}
@@ -273,7 +418,7 @@ export default function TrackFlightPage() {
                   {/* Price */}
                   <div className="p-4 bg-[#4f1032] text-white rounded-lg">
                     <div className="text-center">
-                      <div className="text-2xl font-bold">{formatPrice(flight.price)}</div>
+                      <div className="text-2xl font-bold">${Number(flight.price).toFixed(2)}</div>
                       <div>Total Price</div>
                     </div>
                   </div>
@@ -284,33 +429,34 @@ export default function TrackFlightPage() {
                   {/* Passenger Information */}
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <h3 className="font-bold text-lg text-[#4f1032] mb-4">Passenger Information</h3>
-                    {booking ? (
-                      <div>
-                        <div className="font-semibold">Passenger Name</div>
-                        <div className="text-gray-600">{booking.passenger_name || "N/A"}</div>
+                    <div>
+                      <div className="font-semibold">Passenger Name</div>
+                      <div className="text-gray-600">
+                        {(booking && booking.passenger_name) ? booking.passenger_name : (flight.passenger_name || "N/A")}
                       </div>
-                    ) : (
-                      <div className="text-gray-600">No passenger information available</div>
-                    )}
+                    </div>
                   </div>
                   
                   {/* Booking Status */}
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <h3 className="font-bold text-lg text-[#4f1032] mb-4">Booking Status</h3>
-                    
                     {booking ? (
                       <div>
+                        {/* Status indicator */}
                         <div className="flex items-center gap-2 mb-4">
-                          <div className={`w-3 h-3 rounded-full ${booking.paid ? 'bg-green-500' : 'bg-yellow-500'}`}></div>
+                          <div className={`w-3 h-3 rounded-full 
+                            ${booking.status === 'approved' && booking.paid ? 'bg-green-500' : 
+                              booking.status === 'awaiting_approval' ? 'bg-yellow-500' : 'bg-gray-400'}`}></div>
                           <span className="font-semibold">
-                            {booking.paid ? 'Payment Completed' : 'Payment Pending'}
+                            {booking.status === 'approved' && booking.paid ? 'Approved' :
+                              booking.status === 'awaiting_approval' ? 'Awaiting Approval' :
+                              'Pending'}
                           </span>
                         </div>
-                        
-                        {booking.paid ? (
+                        {/* Show Download Ticket only if approved and paid */}
+                        {booking.status === 'approved' && booking.paid ? (
                           <div className="space-y-3">
-                            <div className="text-green-600 font-semibold">✓ Your flight is confirmed!</div>
-                            {/* Render the ticket visibly for PDF generation */}
+                            <div className="text-green-600 font-semibold">✓ Your flight is confirmed and approved!</div>
                             <div className="my-6">
                               <FlightTicket
                                 ref={ticketRef}
@@ -335,16 +481,17 @@ export default function TrackFlightPage() {
                               Download Ticket (PDF)
                             </button>
                           </div>
+                        ) : booking.status === 'awaiting_approval' ? (
+                          <div className="space-y-3">
+                            <div className="text-yellow-600 font-semibold">Your payment proof has been submitted. Awaiting admin approval.</div>
+                          </div>
+                        ) : booking.status === 'approved' ? (
+                          <div className="space-y-3">
+                            <div className="text-green-600 font-semibold">Payment confirmed! Your booking has been approved.</div>
+                          </div>
                         ) : (
                           <div className="space-y-3">
                             <div className="text-yellow-600 font-semibold">Payment required to confirm your booking</div>
-                            <button
-                              className="w-full bg-[#cd7e0f] text-white py-3 rounded-lg hover:bg-[#cd7e0f]/90 transition"
-                              onClick={handleMarkAsPaidAndGenerateTicket}
-                              disabled={paymentLoading}
-                            >
-                              {paymentLoading ? "Processing..." : "Pay Now"}
-                            </button>
                           </div>
                         )}
                       </div>
@@ -370,6 +517,81 @@ export default function TrackFlightPage() {
                       <p className="mt-2">Use this number to track your flight status anytime.</p>
                     </div>
                   </div>
+
+                  {/* Payment Section for Tracked Flights */}
+                  {!booking?.paid && (
+                    <div className="space-y-4 mt-6">
+                      <h4 className="font-bold text-lg text-[#4f1032]">Pay For Flight</h4>
+                      <button
+                        className="w-full bg-[#4f1032] text-white py-3 rounded-lg hover:bg-[#cd7e0f] transition"
+                        onClick={handleOpenWalletsModal}
+                      >
+                        Pay For Flight
+                      </button>
+                    </div>
+                  )}
+      {/* Wallets Modal */}
+      <Modal open={showWalletsModal} onClose={() => setShowWalletsModal(false)} title="Select a Crypto Wallet">
+        <div className="space-y-4">
+          {wallets.length === 0 && <div>Loading wallets...</div>}
+          {wallets.map((wallet) => (
+            <button
+              key={wallet.id}
+              className="w-full border rounded p-4 flex flex-col items-start hover:bg-gray-50"
+              onClick={() => handleSelectWallet(wallet)}
+            >
+              <div className="font-bold text-lg">{wallet.name}</div>
+              <div className="text-gray-600 text-sm">Network: {wallet.network}</div>
+            </button>
+          ))}
+        </div>
+      </Modal>
+
+      {/* Payment Modal */}
+      <Modal open={showPaymentModal} onClose={handleClosePaymentModal} title="Pay With Crypto">
+        {selectedWallet && (
+          <form onSubmit={handleSubmitProof} className="space-y-4">
+            <div>
+              <div className="font-bold">{selectedWallet.name}</div>
+              <div className="text-gray-600">Network: {selectedWallet.network}</div>
+              <div className="text-gray-600">Address: <span className="font-mono break-all">{selectedWallet.wallet_address}</span></div>
+              {selectedWallet.qr_code_url && (
+                <img src={selectedWallet.qr_code_url} alt="QR Code" className="w-32 h-32 object-contain my-2" />
+              )}
+              <div className="text-blue-700 font-semibold mt-2">Send the exact amount to this address and upload your payment proof below.</div>
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Amount Paid</label>
+              <input
+                type="number"
+                min="0"
+                step="any"
+                value={paymentAmount}
+                onChange={e => setPaymentAmount(e.target.value)}
+                className="w-full border rounded p-2"
+                required
+              />
+            </div>
+            <div>
+              <label className="block font-semibold mb-1">Upload Proof of Payment</label>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={handleProofFileChange}
+                className="w-full"
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              className="w-full bg-[#4f1032] text-white py-2 rounded hover:bg-[#cd7e0f] transition"
+              disabled={submittingProof}
+            >
+              {submittingProof ? "Submitting..." : "Submit Proof"}
+            </button>
+          </form>
+        )}
+      </Modal>
                 </div>
               </div>
             </div>
@@ -378,4 +600,4 @@ export default function TrackFlightPage() {
       )}
     </div>
   );
-} 
+}

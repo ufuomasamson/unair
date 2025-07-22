@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
+import { supabase, TABLES } from "@/lib/supabaseClient";
 import FlightTicket from "@/app/components/FlightTicket";
 import { downloadTicket } from "@/lib/downloadTicket";
 
@@ -16,34 +16,74 @@ export default function TicketPage() {
   useEffect(() => {
     const fetchTicket = async () => {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setError("You must be logged in to view your ticket.");
+      
+      try {
+        // Get user from Supabase session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          setError("You must be logged in to view your ticket.");
+          setLoading(false);
+          return;
+        }
+        
+        const userId = session.user.id;
+        
+        // Use Supabase to fetch booking data
+        const bookingsList = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.BOOKINGS,
+          [
+            Query.equal("user_id", userId),
+            Query.equal("payment_status", "paid"),
+            Query.orderDesc("payment_date"),
+            Query.limit(1)
+          ]
+        );
+        
+        const booking = bookingsList.documents[0];
+        
+        if (!booking) {
+          throw new Error("No paid booking found");
+        }
+        
+        // Get the flight information
+        const flight = await databases.getDocument(
+          DATABASE_ID,
+          COLLECTIONS.FLIGHTS,
+          booking.flight_id
+        );
+        
+        // Get airline information
+        const airline = await databases.getDocument(
+          DATABASE_ID,
+          COLLECTIONS.AIRLINES,
+          flight.airline_id
+        );
+        
+        // Combine the data for compatibility with existing component
+        const bookingData = {
+          ...booking,
+          flights: {
+            ...flight,
+            airline: airline
+          }
+        };
+          
+        // Set the booking data
+        setBooking(bookingData);
+        
+        // Fetch airline logo if available
+        if (airline && airline.logo_url) {
+          setAirlineLogo(airline.logo_url);
+        } else {
+          setAirlineLogo("/globe.svg"); // fallback logo
+        }
         setLoading(false);
-        return;
-      }
-      // Fetch latest paid booking for this user
-      const { data: booking, error: bookingError } = await supabase
-        .from("bookings")
-        .select(`*, flights(*, airline:airlines(*))`)
-        .eq("user_id", user.id)
-        .eq("payment_status", "paid")
-        .order("payment_date", { ascending: false })
-        .limit(1)
-        .single();
-      if (bookingError || !booking) {
-        setError("No paid booking found. Please complete payment first.");
+      } catch (error) {
+        console.error("Error fetching ticket:", error);
+        setError("Failed to load ticket information");
         setLoading(false);
-        return;
       }
-      setBooking(booking);
-      // Fetch airline logo if available
-      if (booking.flights && booking.flights.airline && booking.flights.airline.logo_url) {
-        setAirlineLogo(booking.flights.airline.logo_url);
-      } else {
-        setAirlineLogo("/globe.svg"); // fallback logo
-      }
-      setLoading(false);
     };
     fetchTicket();
   }, []);

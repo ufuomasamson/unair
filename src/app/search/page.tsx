@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import { supabase } from "@/supabaseClient";
 
 export default function SearchPage() {
   const [departureCountry, setDepartureCountry] = useState("");
@@ -20,12 +19,19 @@ export default function SearchPage() {
   useEffect(() => {
     // Fetch airlines and locations for dropdowns
     const fetchData = async () => {
-      const [{ data: airlinesData }, { data: locationsData }] = await Promise.all([
-        supabase.from("airlines").select("id, name, logo_url"),
-        supabase.from("locations").select("id, city, country")
-      ]);
-      setAirlines(airlinesData || []);
-      setLocations(locationsData || []);
+      try {
+        const [airlinesRes, locationsRes] = await Promise.all([
+          fetch("/api/airlines"),
+          fetch("/api/locations")
+        ]);
+        const airlinesData = await airlinesRes.json();
+        const locationsData = await locationsRes.json();
+        setAirlines(airlinesData || []);
+        setLocations(locationsData || []);
+      } catch (err) {
+        setAirlines([]);
+        setLocations([]);
+      }
     };
     fetchData();
   }, []);
@@ -36,23 +42,29 @@ export default function SearchPage() {
     setError("");
     setResults([]);
     
-    // Query flights from Supabase (placeholder query, adjust as needed)
-    const { data, error } = await supabase
-      .from("flights")
-      .select(`*, airline:airlines(*), departure:locations(*), arrival:locations(*)`)
-      .eq("departure_city", departureCity)
-      .eq("departure_country", departureCountry)
-      .eq("arrival_city", arrivalCity)
-      .eq("arrival_country", arrivalCountry)
-      .eq("date", flightDate);
-    
-    if (error) {
+    // Query flights from API
+    try {
+      const response = await fetch("/api/flights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          departureCity,
+          departureCountry,
+          arrivalCity,
+          arrivalCountry,
+          flightDate
+        })
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.error || "Error fetching flights");
+        setLoading(false);
+        return;
+      }
+      setResults(data || []);
+    } catch (err) {
       setError("Error fetching flights");
-      setLoading(false);
-      return;
     }
-    
-    setResults(data || []);
     setLoading(false);
   };
 
@@ -214,27 +226,27 @@ export default function SearchPage() {
                       <div className="flex-1">
                         <div className="flex items-center gap-8">
                           <div>
-                            <div className="font-bold text-lg">{flight.departure?.city}</div>
-                            <div className="text-gray-600 text-sm">{flight.departure?.country}</div>
+                            <div className="font-bold text-lg">{flight.departure_location?.city || 'Departure City'}</div>
+                            <div className="text-gray-600 text-sm">{flight.departure_location?.country || ''}</div>
                           </div>
                           <div className="text-center">
                             <div className="text-2xl text-[#cd7e0f]">→</div>
                             <div className="text-sm text-gray-600">{flight.flight_number}</div>
                           </div>
                           <div className="text-right">
-                            <div className="font-bold text-lg">{flight.arrival?.city}</div>
-                            <div className="text-gray-600 text-sm">{flight.arrival?.country}</div>
+                            <div className="font-bold text-lg">{flight.arrival_location?.city || 'Arrival City'}</div>
+                            <div className="text-gray-600 text-sm">{flight.arrival_location?.country || ''}</div>
                           </div>
                         </div>
                         <div className="mt-2 text-sm text-gray-600">
-                          Date: {flight.date} | Time: {flight.time} | {flight.airline?.name}
+                          Date: {flight.date} | Time: {flight.time} | {flight.airline?.name || 'Airline'}
                         </div>
                       </div>
                     </div>
                     
                     {/* Price and Action */}
                     <div className="text-right">
-                      <div className="text-2xl font-bold text-[#cd7e0f] mb-2">₦{flight.price}</div>
+                      <div className="text-2xl font-bold text-[#cd7e0f] mb-2">${Number(flight.price).toFixed(2)}</div>
                       <a
                         href={`/pay/${flight.tracking_number}`}
                         className="bg-[#4f1032] text-white px-6 py-2 rounded-lg hover:bg-[#4f1032]/90 transition"

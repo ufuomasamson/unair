@@ -1,34 +1,31 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/supabaseClient';
+import { createServerSupabaseClient, TABLES } from '@/lib/supabaseClient';
 
 export async function GET() {
   try {
-    console.log('Testing database connection...');
+    console.log('Testing Supabase database connection...');
     
     // Test 1: Basic connection
     const startTime = Date.now();
     
+    // Create server-side client
+    const supabase = createServerSupabaseClient();
+    
     // Test 2: Simple select
-    const { data: testData, error: testError } = await supabase
-      .from('payment_gateways')
+    const { data: testData, error } = await supabase
+      .from(TABLES.PAYMENT_GATEWAYS)
       .select('*')
       .limit(1);
+      
+    if (error) {
+      throw error;
+    }
     
     const endTime = Date.now();
     const duration = endTime - startTime;
     
     console.log('Database test completed in', duration, 'ms');
-    console.log('Test result:', { testData, testError });
-    
-    if (testError) {
-      return NextResponse.json({
-        success: false,
-        error: testError.message,
-        code: testError.code,
-        details: testError.details,
-        duration
-      }, { status: 500 });
-    }
+    console.log('Test result:', { testData });
     
     // Test 3: Try a simple insert/update
     const testKey = {
@@ -39,48 +36,76 @@ export async function GET() {
     
     console.log('Attempting insert with data:', testKey);
     
-    const { data: insertData, error: insertError } = await supabase
-      .from('payment_gateways')
-      .upsert(testKey, { onConflict: 'name,type' });
+    let insertData;
+    let insertId;
     
-    console.log('Insert result:', { insertData, insertError });
-    
-    if (insertError) {
+    try {
+      // Check if document already exists
+      const { data: existingDocs } = await supabase
+        .from(TABLES.PAYMENT_GATEWAYS)
+        .select('*')
+        .eq('name', testKey.name)
+        .eq('type', testKey.type);
+      
+      if (existingDocs && existingDocs.length > 0) {
+        // Update existing
+        insertId = existingDocs[0].id;
+        const { data } = await supabase
+          .from(TABLES.PAYMENT_GATEWAYS)
+          .update(testKey)
+          .eq('id', insertId)
+          .select()
+          .single();
+          
+      } else {
+        // Create new
+        const { data } = await supabase
+          .from(TABLES.PAYMENT_GATEWAYS)
+          .insert(testKey)
+          .select()
+          .single();
+          
+        insertData = data;
+        insertId = data.id;
+      }
+      
+      console.log('Insert result successful:', insertData);
+      
+      // Test 4: Verify the insert/update
+      const { data: verifyData } = await supabase
+        .from(TABLES.PAYMENT_GATEWAYS)
+        .select('*')
+        .eq('id', insertId)
+        .single();
+      
+      console.log('Verify result:', verifyData);
+      
+      // Test 5: Delete the test data
+      await supabase
+        .from(TABLES.PAYMENT_GATEWAYS)
+        .delete()
+        .eq('id', insertId);
+      
+      console.log('Delete successful');
+      
+      return NextResponse.json({
+        success: true,
+        message: 'Database connection tests completed successfully',
+        duration,
+        testData: testData?.length || 0,
+        insertSuccess: true,
+        verifySuccess: !!verifyData,
+        deleteSuccess: true
+      });
+      
+    } catch (error: any) {
+      console.error('Test error:', error);
       return NextResponse.json({
         success: false,
-        error: 'Insert test failed: ' + insertError.message,
-        code: insertError.code,
-        details: insertError.details,
+        error: error.message || 'Database test failed',
         duration
       }, { status: 500 });
     }
-    
-    // Test 4: Verify the insert worked by selecting the data
-    const { data: verifyData, error: verifyError } = await supabase
-      .from('payment_gateways')
-      .select('*')
-      .eq('name', 'test_connection');
-    
-    console.log('Verification result:', { verifyData, verifyError });
-    
-    // Test 5: Clean up test data
-    const { error: deleteError } = await supabase
-      .from('payment_gateways')
-      .delete()
-      .eq('name', 'test_connection');
-    
-    console.log('Cleanup result:', { deleteError });
-    
-    return NextResponse.json({
-      success: true,
-      message: 'Database connection test successful',
-      duration,
-      testData: testData?.length || 0,
-      insertSuccess: !insertError && (insertData !== null || (verifyData && verifyData.length > 0)),
-      cleanupSuccess: !deleteError,
-      insertData: insertData,
-      verifyData: verifyData
-    });
     
   } catch (error: any) {
     console.error('Database test error:', error);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/supabaseClient';
+import { getDB } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -19,40 +19,53 @@ export async function GET(request: NextRequest) {
     }
 
     // Find the booking using tx_ref
-    const { data: booking, error: bookingError } = await supabase
-      .from('bookings')
-      .select(`
-        *,
-        flight:flights(
-          *,
-          airline:airlines(*),
-          departure:locations!flights_departure_location_id_fkey(city, country),
-          arrival:locations!flights_arrival_location_id_fkey(city, country)
-        )
-      `)
-      .eq('tx_ref', txRef)
-      .single();
+    const db = await getDB();
+    
+    // Get booking with related data
+    const [bookingRows] = await db.query(`
+      SELECT 
+        b.*,
+        f.id as flight_id,
+        f.flight_number,
+        f.date,
+        f.time,
+        f.price,
+        f.currency,
+        a.id as airline_id,
+        a.name as airline_name,
+        a.logo_url as airline_logo,
+        dl.city AS departure_city,
+        dl.country AS departure_country,
+        al.city AS arrival_city,
+        al.country AS arrival_country
+      FROM bookings b
+      LEFT JOIN flights f ON b.flight_id = f.id
+      LEFT JOIN airlines a ON f.airline_id = a.id
+      LEFT JOIN locations dl ON f.departure_location_id = dl.id
+      LEFT JOIN locations al ON f.arrival_location_id = al.id
+      WHERE b.tx_ref = ?
+    `, [txRef]);
 
-    if (bookingError || !booking) {
+    if (!bookingRows || !Array.isArray(bookingRows) || bookingRows.length === 0) {
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/track?error=Booking not found`);
     }
+    
+    const booking = bookingRows[0] as any;
 
     // Update booking as paid
-    const { error: updateError } = await supabase
-      .from('bookings')
-      .update({ 
-        paid: true,
-        payment_transaction_id: transactionId,
-        payment_date: new Date().toISOString()
-      })
-      .eq('id', booking.id);
-
-    if (updateError) {
+    try {
+      await db.query(
+        'UPDATE bookings SET paid = ?, payment_transaction_id = ?, payment_date = ? WHERE id = ?',
+        [true, transactionId, new Date().toISOString(), booking.id]
+      );
+    } catch (error) {
+      console.error('Failed to update booking:', error);
       return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/track?error=Failed to update booking`);
     }
 
     // Redirect to success page
-    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/track?success=Payment successful&tx_ref=${booking.flight.tracking_number}`);
+    const trackingNumber = booking.tracking_number || txRef;
+    return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/track?success=Payment successful&tx_ref=${trackingNumber}`);
 
   } catch (error) {
     console.error('Payment callback error:', error);

@@ -1,6 +1,8 @@
-# 🛫 Flight Booking Application
+# 🛫 United Airline Flight Booking
 
 A modern, full-stack flight booking application built with Next.js, Supabase, and Flutterwave payment integration.
+
+> **🔄 Migration Update**: This project has been migrated from MySQL to Supabase. See the [SUPABASE_MIGRATION_GUIDE.md](./SUPABASE_MIGRATION_GUIDE.md) file for details about the migration process and troubleshooting Row Level Security (RLS) issues.
 
 ## ✨ Features
 
@@ -31,7 +33,7 @@ A modern, full-stack flight booking application built with Next.js, Supabase, an
 ## 🚀 Tech Stack
 
 - **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
-- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **Backend**: Appwrite (Database, Auth, Storage)
 - **Payment**: Flutterwave API
 - **State Management**: Zustand
 - **Styling**: Tailwind CSS with custom design system
@@ -40,7 +42,7 @@ A modern, full-stack flight booking application built with Next.js, Supabase, an
 
 - Node.js 18+ 
 - npm or yarn
-- Supabase account
+- Appwrite account
 - Flutterwave account (for payments)
 
 ## 🛠️ Installation
@@ -59,19 +61,44 @@ npm install
 ### 3. Environment Setup
 Create a `.env.local` file in the root directory:
 ```env
-# Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+# Appwrite Configuration
+NEXT_PUBLIC_APPWRITE_ENDPOINT=https://cloud.appwrite.io/v1
+NEXT_PUBLIC_APPWRITE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_APPWRITE_DATABASE_ID=your_database_id
+NEXT_PUBLIC_APPWRITE_BUCKET_ID=your_bucket_id
+
+# Appwrite Collection IDs
+NEXT_PUBLIC_APPWRITE_USERS_COLLECTION_ID=users_collection_id
+NEXT_PUBLIC_APPWRITE_FLIGHTS_COLLECTION_ID=flights_collection_id
+NEXT_PUBLIC_APPWRITE_AIRLINES_COLLECTION_ID=airlines_collection_id
+NEXT_PUBLIC_APPWRITE_BOOKINGS_COLLECTION_ID=bookings_collection_id
+NEXT_PUBLIC_APPWRITE_LOCATIONS_COLLECTION_ID=locations_collection_id
+NEXT_PUBLIC_APPWRITE_PAYMENTS_COLLECTION_ID=payments_collection_id
+NEXT_PUBLIC_APPWRITE_CURRENCIES_COLLECTION_ID=currencies_collection_id
+NEXT_PUBLIC_APPWRITE_USER_PREFERENCES_COLLECTION_ID=user_preferences_id
 
 # Application Configuration
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 
-### 4. Database Setup
-Run the database migrations in your Supabase SQL editor:
-```sql
--- Run the database_migration_final.sql script
--- This sets up all required tables and RLS policies
+### 4. Appwrite Setup
+1. Create a new project in Appwrite
+2. Set up authentication (Email/Password)
+3. Create a database with the required collections
+4. Create storage buckets for files
+
+For detailed setup instructions, refer to [APPWRITE_SETUP_COMPLETE.md](./APPWRITE_SETUP_COMPLETE.md)
+
+### 5. Verify Appwrite Connection
+```bash
+# Run migration helper script
+node appwrite-migration-helper.js
+
+# Start development server
+npm run dev
+
+# Visit test page
+open http://localhost:3000/test-appwrite
 ```
 
 ### 5. Payment Configuration
@@ -99,6 +126,25 @@ Visit [http://localhost:3000](http://localhost:3000) to see the application.
 - `currencies` - Multi-currency support
 - `payment_gateways` - Payment configuration
 - `user_preferences` - User settings
+
+### MySQL Database Setup for cPanel
+1. **Create the Database**
+   - Go to MySQL Databases in cPanel
+   - Create a new database named `united_airline` (or your preferred name)
+   - Create a new database user with a strong password
+   - Add the user to the database with ALL PRIVILEGES
+
+2. **Import Database Structure**
+   - Navigate to phpMyAdmin from cPanel
+   - Select your newly created database
+   - Click on the "Import" tab
+   - Upload and execute the comprehensive SQL file:
+     - `united_airline_complete_database.sql` - Creates all tables, relationships, and adds sample data
+     
+3. **Verify Database Setup**
+   - Check that all tables were created successfully (should see 10 tables)
+   - Verify sample data was imported correctly (locations, airlines, currencies)
+   - Test the database connection with your application
 
 ## 💳 Payment Flow
 
@@ -137,17 +183,20 @@ Use Flutterwave test cards:
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+### Truehost cPanel Hosting
 
-### Environment Variables for Production
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_production_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_production_supabase_anon_key
-NEXT_PUBLIC_BASE_URL=https://your-domain.com
-```
+We've prepared detailed instructions for deploying this application to Truehost cPanel in the [CPANEL_DEPLOYMENT.md](./CPANEL_DEPLOYMENT.md) file.
+
+**Quick Overview of Truehost cPanel Deployment:**
+
+1. **Create MySQL Database** in Truehost cPanel's MySQL Database tool (note the username prefix)
+2. **Import SQL Files** using phpMyAdmin with the single `united_airline_complete_database.sql` file
+3. **Upload Application Files** via Truehost File Manager (compressed ZIP recommended)
+4. **Configure Environment Variables** in a `.env` file with your Truehost database credentials
+5. **Set Up Node.js Application** using Truehost's Setup Node.js App tool in cPanel
+6. **Configure Domain and SSL** for secure access to your application
+
+See the complete step-by-step guide specifically tailored for Truehost in [CPANEL_DEPLOYMENT.md](./CPANEL_DEPLOYMENT.md)
 
 ## 📁 Project Structure
 

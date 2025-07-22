@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 
 export default function LocationsPage() {
   const [locations, setLocations] = useState<any[]>([]);
@@ -18,74 +17,62 @@ export default function LocationsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const checkRoleAndFetch = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
+    // Protect route: only admin
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      router.replace('/login');
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      if (userObj.role !== 'admin') {
+        router.replace('/search');
         return;
       }
-      
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-        
-      if (error || !data || data.role !== "admin") {
-        router.replace("/search");
-        return;
-      }
-      
       setIsAdmin(true);
-      await fetchLocations();
-      setLoading(false);
-    };
-    
-    checkRoleAndFetch();
+    } catch {
+      router.replace('/login');
+      return;
+    }
+    fetchLocations();
   }, [router]);
 
   const fetchLocations = async () => {
-    const { data, error } = await supabase.from("locations").select("*").order("country").order("city");
-    if (!error && data) {
-      setLocations(data);
+    try {
+      const res = await fetch('/api/locations');
+      const data = await res.json();
+      setLocations(data || []);
+    } catch (err) {
+      setError('Failed to fetch locations');
     }
+    setLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
     if (!formData.city.trim() || !formData.country.trim()) {
       setError("Both city and country are required");
       return;
     }
-
     try {
-      if (editingId) {
-        // Update existing location
-        const { error } = await supabase
-          .from("locations")
-          .update(formData)
-          .eq("id", editingId);
-        
-        if (error) throw error;
-        setSuccess("Location updated successfully!");
-      } else {
-        // Create new location
-        const { error } = await supabase
-          .from("locations")
-          .insert([formData]);
-        
-        if (error) throw error;
-        setSuccess("Location created successfully!");
+      const method = editingId ? 'PUT' : 'POST';
+      const url = editingId ? `/api/locations/${editingId}` : '/api/locations';
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save location');
       }
-      
+      setSuccess(editingId ? 'Location updated successfully!' : 'Location created successfully!');
       setFormData({ city: "", country: "" });
       setEditingId(null);
       setShowForm(false);
-      await fetchLocations();
-      
+      fetchLocations();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err: any) {
       setError(err.message || "An error occurred");
@@ -100,13 +87,14 @@ export default function LocationsPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this location?")) return;
-    
     try {
-      const { error } = await supabase.from("locations").delete().eq("id", id);
-      if (error) throw error;
-      
+      const res = await fetch(`/api/locations/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete location');
+      }
       setSuccess("Location deleted successfully!");
-      await fetchLocations();
+      fetchLocations();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err: any) {
       setError(err.message || "An error occurred");

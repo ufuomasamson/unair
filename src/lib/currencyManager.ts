@@ -33,10 +33,9 @@ export const useCurrencyStore = create<CurrencyState>((set, get) => ({
     set({ currency });
   },
   formatPrice: (price: number) => {
-    const { currency } = get();
-    const rate = exchangeRates[currency as keyof typeof exchangeRates] || 1;
-    const symbol = currencySymbols[currency as keyof typeof currencySymbols] || '€';
-    const convertedPrice = price * rate;
-    return `${symbol}${convertedPrice.toFixed(2)}`;
+    // Always return the price in the original currency without conversion
+    // This ensures consistent pricing throughout the app
+    const symbol = '$';
+    return `${symbol}${Number(price).toFixed(2)}`;
   }
 }));

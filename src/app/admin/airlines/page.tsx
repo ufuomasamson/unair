@@ -1,7 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 
 function AirlinesPage() {
   const [airlines, setAirlines] = useState<any[]>([]);
@@ -14,76 +13,42 @@ function AirlinesPage() {
     logo_url: ""
   });
   const [logoFile, setLogoFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
-    const checkRoleAndFetch = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
+    // Protect route: only admin
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      router.replace('/login');
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      if (userObj.role !== 'admin') {
+        router.replace('/search');
         return;
       }
-      
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-        
-      if (error || !data || data.role !== "admin") {
-        router.replace("/search");
-        return;
-      }
-      
       setIsAdmin(true);
-      await fetchAirlines();
-      setLoading(false);
-    };
-    
-    checkRoleAndFetch();
+    } catch {
+      router.replace('/login');
+      return;
+    }
+    fetchAirlines();
   }, [router]);
 
   const fetchAirlines = async () => {
-    const { data, error } = await supabase.from("airlines").select("*").order("name");
-    if (!error && data) {
-      setAirlines(data);
-    }
-  };
-
-  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setLogoFile(e.target.files[0]);
-    }
-  };
-
-  const uploadLogo = async (file: File, airlineName: string): Promise<string> => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${airlineName.replace(/\s+/g, "_").toLowerCase()}_${Date.now()}.${fileExt}`;
-    
     try {
-      // Try to upload to a more generic bucket name
-      const { data, error } = await supabase.storage
-        .from("images")
-        .upload(fileName, file, { upsert: true });
-      
-      if (error) {
-        console.error("Storage upload error:", error);
-        throw new Error(`Upload failed: ${error.message}`);
-      }
-      
-      const { data: urlData } = supabase.storage
-        .from("images")
-        .getPublicUrl(fileName);
-      
-      return urlData.publicUrl;
-    } catch (uploadError) {
-      console.error("Upload error:", uploadError);
-      throw new Error("Failed to upload logo. Please check your Supabase storage configuration.");
+      const res = await fetch('/api/airlines');
+      const data = await res.json();
+      setAirlines(data || []);
+    } catch (err) {
+      setError('Failed to fetch airlines');
     }
+    setLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -91,57 +56,37 @@ function AirlinesPage() {
     setError("");
     setSuccess("");
     setUploading(true);
-    
     if (!formData.name.trim()) {
       setError("Airline name is required");
       setUploading(false);
       return;
     }
-
     try {
-      let logoUrl = formData.logo_url;
-      
-      // Upload new logo if file is selected
-      if (logoFile) {
-        logoUrl = await uploadLogo(logoFile, formData.name);
+      const method = editingId ? 'PUT' : 'POST';
+      const url = editingId ? `/api/airlines/${editingId}` : '/api/airlines';
+      const form = new FormData();
+      form.append('name', formData.name);
+      if (logoFile) form.append('logo', logoFile);
+      if (formData.logo_url && !logoFile) form.append('logo_url', formData.logo_url);
+      const res = await fetch(url, {
+        method,
+        body: form,
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save airline');
       }
-
-      const airlineData = {
-        name: formData.name,
-        logo_url: logoUrl
-      };
-
-      if (editingId) {
-        // Update existing airline
-        const { error } = await supabase
-          .from("airlines")
-          .update(airlineData)
-          .eq("id", editingId);
-        
-        if (error) throw error;
-        setSuccess("Airline updated successfully!");
-      } else {
-        // Create new airline
-        const { error } = await supabase
-          .from("airlines")
-          .insert([airlineData]);
-        
-        if (error) throw error;
-        setSuccess("Airline created successfully!");
-      }
-      
+      setSuccess(editingId ? 'Airline updated successfully!' : 'Airline created successfully!');
       setFormData({ name: "", logo_url: "" });
       setLogoFile(null);
       setEditingId(null);
       setShowForm(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
-      await fetchAirlines();
-      
+      fetchAirlines();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err: any) {
       setError(err.message || "An error occurred");
     }
-    
     setUploading(false);
   };
 
@@ -155,13 +100,14 @@ function AirlinesPage() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this airline?")) return;
-    
     try {
-      const { error } = await supabase.from("airlines").delete().eq("id", id);
-      if (error) throw error;
-      
+      const res = await fetch(`/api/airlines/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to delete airline');
+      }
       setSuccess("Airline deleted successfully!");
-      await fetchAirlines();
+      fetchAirlines();
       setTimeout(() => setSuccess(""), 3000);
     } catch (err: any) {
       setError(err.message || "An error occurred");
@@ -245,14 +191,24 @@ function AirlinesPage() {
                   </label>
                   <input
                     type="file"
-                    accept="image/*,.svg"
-                    onChange={handleLogoChange}
+                    accept="image/*"
                     ref={fileInputRef}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                    className="w-full p-3 border border-gray-300 rounded-lg"
+                    onChange={e => {
+                      setLogoFile(e.target.files?.[0] || null);
+                      // Clear logo_url if file is selected
+                      if (e.target.files?.[0]) setFormData(f => ({ ...f, logo_url: "" }));
+                    }}
                   />
-                  <p className="text-sm text-gray-500 mt-1">
-                    {editingId && formData.logo_url ? "Current logo will be replaced if a new file is selected" : "Upload airline logo (PNG, JPG, SVG, etc.)"}
-                  </p>
+                  <p className="text-sm text-gray-500 mt-1">Upload an image for the airline logo, or paste a direct image URL below.</p>
+                  <input
+                    type="text"
+                    placeholder="Paste logo image URL (optional)"
+                    value={formData.logo_url}
+                    onChange={e => setFormData({ ...formData, logo_url: e.target.value })}
+                    className="w-full p-3 border border-gray-300 rounded-lg mt-2 focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                    disabled={!!logoFile}
+                  />
                 </div>
               </div>
 

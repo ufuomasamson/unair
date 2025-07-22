@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabase } from '@/supabaseClient';
 import { useCurrencyStore } from '@/lib/currencyManager';
 
 type NavigationProps = {
@@ -17,23 +16,24 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
   const { currency, setCurrency } = useCurrencyStore();
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push('/');
+    try {
+      // Call logout API to clear cookie and sign out from Supabase
+      const response = await fetch("/api/logout", { method: "POST" });
+      if (!response.ok) {
+        console.error("Logout failed:", await response.text());
+      }
+      // Force page reload to update UI
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Error during sign out:", error);
+      router.push('/');
+    }
     setMobileMenuOpen(false);
   };
 
   const handleCurrencyChange = async (newCurrency: string) => {
     setCurrency(newCurrency);
-    if (user) {
-      try {
-        await supabase
-          .from('user_preferences')
-          .update({ currency_code: newCurrency })
-          .eq('user_id', user.id);
-      } catch (error) {
-        console.log('user_preferences table not found, currency change not persisted');
-  }
-    }
+    // TODO: Persist currency preference for user in MySQL
   };
 
   return (

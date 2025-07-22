@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
+
 
 interface Currency {
   id: number;
@@ -30,46 +30,32 @@ export default function CurrencyManagement() {
   });
 
   useEffect(() => {
-    const checkRoleAndFetchData = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
+    // Cookie-based admin check (same as dashboard)
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      router.replace('/login');
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      setUser(userObj);
+      if (userObj.role !== 'admin') {
+        router.replace('/search');
         return;
       }
-      
-      setUser(user);
-      
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-        
-      if (error || !data || data.role !== "admin") {
-        router.replace("/search");
-        return;
-      }
-      
       setIsAdmin(true);
-      await fetchCurrencies();
-      setLoading(false);
-    };
-    
-    checkRoleAndFetchData();
+    } catch {
+      router.replace('/login');
+      return;
+    }
+    fetchCurrencies();
+    setLoading(false);
   }, [router]);
 
   const fetchCurrencies = async () => {
     try {
-      const { data, error } = await supabase
-        .from("currencies")
-        .select("*")
-        .order("code");
-      
-      if (error) {
-        console.error("Error fetching currencies:", error);
-        return;
-      }
-      
+      const res = await fetch('/api/currencies');
+      const data = await res.json();
       setCurrencies(data || []);
     } catch (error) {
       console.error("Error fetching currencies:", error);
@@ -78,15 +64,15 @@ export default function CurrencyManagement() {
 
   const handleAddCurrency = async () => {
     try {
-      const { error } = await supabase
-        .from("currencies")
-        .insert([newCurrency]);
-      
-      if (error) {
-        console.error("Error adding currency:", error);
-        return;
+      const res = await fetch('/api/currencies', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCurrency),
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
       }
-      
       setNewCurrency({
         code: "",
         name: "",
@@ -103,24 +89,16 @@ export default function CurrencyManagement() {
 
   const handleUpdateCurrency = async () => {
     if (!editingCurrency) return;
-    
     try {
-      const { error } = await supabase
-        .from("currencies")
-        .update({
-          code: editingCurrency.code,
-          name: editingCurrency.name,
-          symbol: editingCurrency.symbol,
-          exchange_rate: editingCurrency.exchange_rate,
-          is_active: editingCurrency.is_active
-        })
-        .eq("id", editingCurrency.id);
-      
-      if (error) {
-        console.error("Error updating currency:", error);
-        return;
+      const res = await fetch(`/api/currencies/${editingCurrency.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editingCurrency),
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
       }
-      
       setEditingCurrency(null);
       await fetchCurrencies();
     } catch (error) {
@@ -130,18 +108,12 @@ export default function CurrencyManagement() {
 
   const handleDeleteCurrency = async (id: number) => {
     if (!confirm("Are you sure you want to delete this currency?")) return;
-    
     try {
-      const { error } = await supabase
-        .from("currencies")
-        .delete()
-        .eq("id", id);
-      
-      if (error) {
-        console.error("Error deleting currency:", error);
-        return;
+      const res = await fetch(`/api/currencies/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const err = await res.text();
+        throw new Error(err);
       }
-      
       await fetchCurrencies();
     } catch (error) {
       console.error("Error deleting currency:", error);
@@ -149,8 +121,8 @@ export default function CurrencyManagement() {
   };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    router.push("/");
+    await fetch('/api/logout', { method: 'POST' });
+    window.location.href = '/';
   };
 
   if (loading) {

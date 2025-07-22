@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
+
 
 export default function CreatedFlightsPage() {
   const [flights, setFlights] = useState<any[]>([]);
@@ -10,55 +10,48 @@ export default function CreatedFlightsPage() {
   const router = useRouter();
 
   const fetchFlights = async () => {
-    const { data: flightsData, error: flightsError } = await supabase
-      .from("flights")
-      .select(`
-        *,
-        airline:airlines(name),
-        departure:locations!flights_departure_location_id_fkey(city, country),
-        arrival:locations!flights_arrival_location_id_fkey(city, country)
-      `);
-      
-    if (flightsError) {
-      console.error("Error fetching flights:", flightsError);
-    } else {
+    try {
+      const res = await fetch("/api/flights");
+      const flightsData = await res.json();
       setFlights(flightsData || []);
+    } catch (error) {
+      console.error("Error fetching flights:", error);
     }
-    
     setLoading(false);
   };
 
   useEffect(() => {
-    const checkRoleAndFetchFlights = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
+    // Cookie-based admin check (same as dashboard)
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      router.replace('/login');
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      if (userObj.role !== 'admin') {
+        router.replace('/search');
         return;
       }
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      if (error || !data || data.role !== "admin") {
-        router.replace("/search");
-        return;
-      }
-      
-      fetchFlights();
-    };
-    
-    checkRoleAndFetchFlights();
+    } catch {
+      router.replace('/login');
+      return;
+    }
+    fetchFlights();
   }, [router]);
 
   const handleDelete = async (flightId: string) => {
     if (window.confirm("Are you sure you want to delete this flight?")) {
-      const { error } = await supabase.from("flights").delete().eq("id", flightId);
-      if (error) {
-        console.error("Error deleting flight:", error);
-      } else {
+      try {
+        const res = await fetch(`/api/flights?id=${flightId}`, { method: 'DELETE' });
+        if (!res.ok) {
+          const err = await res.text();
+          throw new Error(err);
+        }
         setSelectedFlight(null);
         fetchFlights();
+      } catch (error) {
+        console.error("Error deleting flight:", error);
       }
     }
   };
@@ -97,10 +90,12 @@ export default function CreatedFlightsPage() {
                 onClick={() => setSelectedFlight(flight)}
               >
                 <h3 className="text-lg font-semibold text-[#4f1032] mb-2">
-                  {flight.airline?.name} - {flight.flight_number}
+                  {(flight.airline?.name || 'Airline ID: ' + flight.airline_id) + ' - ' + flight.flight_number}
                 </h3>
                 <p className="text-gray-600">
-                  {flight.departure?.city} to {flight.arrival?.city}
+                  {(flight.departure_location?.city || 'Location ID: ' + flight.departure_location_id) + 
+                   ' to ' + 
+                   (flight.arrival_location?.city || 'Location ID: ' + flight.arrival_location_id)}
                 </p>
               </div>
             ))}
@@ -110,7 +105,6 @@ export default function CreatedFlightsPage() {
       {selectedFlight && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50">
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl shadow-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
-            
             <div className="flex justify-between items-start mb-6">
               <div>
                 <h2 className="text-3xl font-bold text-[#4f1032]">Flight Details</h2>
@@ -124,22 +118,26 @@ export default function CreatedFlightsPage() {
               </button>
             </div>
 
-            {/* Flight Info Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+            {/* Redesigned Flight Info Card */}
+            <div className="bg-white rounded-xl shadow-lg p-6 mb-6 text-gray-800">
               <div className="flex items-center gap-6 mb-6">
                 <div className="p-3 bg-blue-100 rounded-lg">
                   <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </div>
                 <div>
-                  <div className="font-bold text-2xl text-[#4f1032]">{selectedFlight.airline?.name}</div>
+                  <div className="font-bold text-2xl text-[#4f1032]">{selectedFlight.airline?.name || 'Airline ID: ' + selectedFlight.airline_id}</div>
                   <div className="text-gray-600">Flight No: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{selectedFlight.flight_number}</span></div>
                 </div>
               </div>
 
-              <div className="space-y-4 text-gray-700">
+              <div className="grid grid-cols-1 gap-3">
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Route:</span>
-                  <span className="text-right">{selectedFlight.departure?.city} → {selectedFlight.arrival?.city}</span>
+                  <span className="text-right">
+                    {(selectedFlight.departure_location?.city || 'Location ID: ' + selectedFlight.departure_location_id) + 
+                     ' → ' + 
+                     (selectedFlight.arrival_location?.city || 'Location ID: ' + selectedFlight.arrival_location_id)}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Date & Time:</span>
@@ -147,29 +145,34 @@ export default function CreatedFlightsPage() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Price:</span>
-                  <span className="text-xl font-bold text-[#cd7e0f]">${selectedFlight.price.toLocaleString()}</span>
+                  <span className="text-xl font-bold text-[#cd7e0f]">${Number(selectedFlight.price).toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Trip:</span>
-                  <span className="text-right">{selectedFlight.trip}</span>
+                  <span className="text-right">{selectedFlight.trip || '-'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Tour Type:</span>
-                  <span className="text-right">{selectedFlight.tour_type}</span>
+                  <span className="text-right">{selectedFlight.tour_type || '-'}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="font-semibold">Passenger/Class:</span>
-                  <span className="text-right">{selectedFlight.passenger_class}</span>
+                  <span className="text-right">
+                    {selectedFlight.passenger_class
+                      || ((selectedFlight.passenger_count ? `${selectedFlight.passenger_count} Passenger${selectedFlight.passenger_count > 1 ? 's' : ''}` : '')
+                        + (selectedFlight.class ? ` ${selectedFlight.class}` : '')).trim()
+                      || '-'}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">Passenger Name:</span>
+                  <span className="text-right">{selectedFlight.passenger_name || 'N/A'}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="font-semibold">Tracking Number:</span>
+                  <span className="text-right font-mono bg-gray-100 px-2 py-1 rounded">{selectedFlight.tracking_number || 'N/A'}</span>
                 </div>
               </div>
-            </div>
-
-            {/* Tracking Number Card */}
-            <div className="bg-white rounded-xl shadow-lg p-6 text-center">
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">Tracking Number</h3>
-              <p className="font-mono text-3xl bg-gray-100 text-[#4f1032] py-3 px-4 rounded-lg">
-                {selectedFlight.tracking_number}
-              </p>
             </div>
 
             <div className="mt-6">

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
+// TODO: Replace Supabase logic with MySQL-based registration using API route
 
 export default function SignupPage() {
   const [email, setEmail] = useState("");
@@ -34,49 +34,79 @@ export default function SignupPage() {
     }
 
     try {
-      // Create user account
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // Import Supabase client
+      const { supabase } = await import('@/lib/supabaseClient');
+      console.log("Signing up with Supabase directly from client");
+      
+      // Try a simpler signup approach without metadata
+      // This avoids potential database schema issues
+      const { data, error } = await supabase.auth.signUp({
         email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-          },
-        },
+        password
       });
-
-      if (signUpError) {
-        setError(signUpError.message);
+      
+      // We'll update the user metadata separately if signup succeeds
+      console.log("Using simplified signup without metadata");
+      
+      if (error) {
+        console.error("Supabase signup error:", error);
+        setError(error.message || "Registration failed");
         setLoading(false);
         return;
       }
-
-      if (data.user) {
-        // Insert user record with role
-        const { error: insertError } = await supabase
-          .from("users")
-          .insert([
-            {
-              id: data.user.id,
-              email: data.user.email,
-              full_name: fullName,
-              role: "user", // Default role for new signups
-            },
-          ]);
-
-        if (insertError) {
-          setError("Error creating user profile");
-          setLoading(false);
-          return;
+      
+      console.log("Signup successful:", data);
+      
+      // If signup was successful and we have a user ID, try to update metadata
+      if (data.user?.id) {
+        try {
+          // Call our API to update user metadata
+          const metadataResponse = await fetch("/api/update-user-metadata", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+              userId: data.user.id,
+              fullName: fullName 
+            }),
+          });
+          
+          console.log("Metadata update response:", await metadataResponse.json());
+          
+          // Set user cookie for server components
+          try {
+            const cookieResponse = await fetch('/api/set-user-cookie', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({ 
+                session: {
+                  user: {
+                    ...data.user,
+                    user_metadata: { full_name: fullName, role: 'user' }
+                  }
+                } 
+              }),
+            });
+            
+            if (!cookieResponse.ok) {
+              console.error('Failed to set user cookie');
+            } else {
+              console.log('User cookie set successfully');
+            }
+          } catch (cookieError) {
+            console.error('Error setting user cookie:', cookieError);
+          }
+        } catch (metadataError) {
+          // Log but don't fail if metadata update fails
+          console.warn("Couldn't update user metadata, but signup succeeded:", metadataError);
         }
-
-        setSuccess("Account created successfully! Please check your email to verify your account.");
-        
-        // Redirect to login after a delay
-        setTimeout(() => {
-          router.push("/login");
-        }, 3000);
       }
+      
+      setSuccess("Account created successfully! Redirecting to dashboard...");
+      setTimeout(() => {
+        window.location.href = "/search";
+      }, 2000);
     } catch (err) {
       setError("An unexpected error occurred");
     }
@@ -178,6 +208,35 @@ export default function SignupPage() {
                 Sign in here
               </a>
             </p>
+          </div>
+          
+          {/* Debug tools */}
+          <div className="mt-6 border-t pt-4">
+            <p className="text-xs text-gray-500">Troubleshooting</p>
+            <div className="mt-1">
+              <a 
+                href="/debug" 
+                className="text-xs text-blue-600 hover:text-blue-800"
+                target="_blank"
+              >
+                Open Supabase Debug Page
+              </a>
+              <br />
+              <a 
+                href="/api/fix-database" 
+                className="text-xs text-blue-600 hover:text-blue-800"
+                target="_blank"
+              >
+                Fix Database Schema
+              </a>
+              <br />
+              <a 
+                href="/direct-signup" 
+                className="text-xs text-blue-600 hover:text-blue-800"
+              >
+                Try Alternative Signup Method
+              </a>
+            </div>
           </div>
         </div>
       </div>

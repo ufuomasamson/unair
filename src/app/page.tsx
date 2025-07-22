@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { supabase } from "@/supabaseClient";
+// ...existing code...
 import jsPDF from "jspdf";
 import Image from "next/image";
 
@@ -26,15 +26,24 @@ export default function HomePage() {
   const [searchLoading, setSearchLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch all flights (basic, no joins)
-    supabase.from("flights").select("*")
-      .then(({ data }) => setFlights(data || []));
-    // Fetch all locations
-    supabase.from("locations").select("*")
-      .then(({ data }) => setLocations(data || []));
-    // Fetch all airlines
-    supabase.from("airlines").select("*")
-      .then(({ data }) => setAirlines(data || []));
+    async function fetchAll() {
+      try {
+        const [flightsRes, locationsRes, airlinesRes] = await Promise.all([
+          fetch("/api/flights"),
+          fetch("/api/locations"),
+          fetch("/api/airlines"),
+        ]);
+        const flightsData = await flightsRes.json();
+        const locationsData = await locationsRes.json();
+        const airlinesData = await airlinesRes.json();
+        setFlights(flightsData);
+        setLocations(locationsData);
+        setAirlines(airlinesData);
+      } catch (err) {
+        console.error("API fetch error:", err);
+      }
+    }
+    fetchAll();
   }, []);
 
   // Autocomplete logic for FROM
@@ -101,114 +110,31 @@ export default function HomePage() {
 
   const handleMarkAsPaidAndGenerateTicket = async () => {
     if (!booking || !flight) return;
-    // 1. Mark booking as paid
-    const { error: updateError } = await supabase
-      .from("bookings")
-      .update({ paid: true })
-      .eq("id", booking.id);
-    if (updateError) {
-      setError("Failed to mark as paid");
-      return;
-    }
-    // 2. Generate PDF ticket
-    const doc = new jsPDF();
-    doc.setFontSize(18);
-    doc.text("Flight Ticket", 20, 20);
-    doc.setFontSize(12);
-    doc.text(`Passenger: ${booking.passenger_name || "N/A"}`, 20, 35);
-    doc.text(`Flight No: ${flight.flight_number}`, 20, 45);
-    doc.text(`Airline: ${flight.airline?.name || ""}`, 20, 55);
-    doc.text(`From: ${flight.departure?.city}, ${flight.departure?.country}`, 20, 65);
-    doc.text(`To: ${flight.arrival?.city}, ${flight.arrival?.country}`, 20, 75);
-    doc.text(`Date: ${flight.date}  Time: ${flight.time}`, 20, 85);
-    doc.text(`Tracking #: ${flight.tracking_number}`, 20, 95);
-    // 3. Upload PDF to Supabase Storage
-    const pdfBlob = doc.output("blob");
-    const fileName = `ticket_${booking.id}.pdf`;
-    const { error: uploadError } = await supabase.storage
-      .from("tickets")
-      .upload(fileName, pdfBlob, { upsert: true, contentType: "application/pdf" });
-    if (uploadError) {
-      setError("Failed to upload ticket");
-      return;
-    }
-    const ticketUrl = supabase.storage.from("tickets").getPublicUrl(fileName).data.publicUrl;
-    // 4. Save ticket URL in booking
-    const { error: urlError } = await supabase
-      .from("bookings")
-      .update({ ticket_url: ticketUrl })
-      .eq("id", booking.id);
-    if (urlError) {
-      setError("Failed to save ticket URL");
-      return;
-    }
-    // 5. Refresh booking
-    const { data: updatedBooking } = await supabase
-      .from("bookings")
-      .select("*")
-      .eq("id", booking.id)
-      .single();
-    setBooking(updatedBooking);
-    setError("");
+    // TODO: Mark booking as paid in MySQL
+    // TODO: Generate PDF ticket and upload to your own storage solution
+    // TODO: Save ticket URL in MySQL
+    // TODO: Refresh booking from MySQL
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8">
-        {/* Moving Clouds Background with 8 PNGs */}
-        <div className="absolute inset-0 z-10 overflow-hidden pointer-events-none">
-          <Image src="/images/cloud1.png" alt="Cloud 1" layout="fill" objectFit="contain" className="absolute w-64 h-auto opacity-70 animate-cloud-move" style={{ top: '15%', animationDuration: '22s', animationDelay: '0s' }} />
-          <Image src="/images/cloud2.png" alt="Cloud 2" layout="fill" objectFit="contain" className="absolute w-80 h-auto opacity-50 animate-cloud-move" style={{ top: '60%', animationDuration: '25s', animationDelay: '2s' }} />
-          <Image src="/images/cloud3.png" alt="Cloud 3" layout="fill" objectFit="contain" className="absolute w-52 h-auto opacity-60 animate-cloud-move" style={{ top: '35%', animationDuration: '20s', animationDelay: '4s' }} />
-          <Image src="/images/cloud4.png" alt="Cloud 4" layout="fill" objectFit="contain" className="absolute w-56 h-auto opacity-55 animate-cloud-move" style={{ top: '50%', animationDuration: '23s', animationDelay: '1s' }} />
-          <Image src="/images/cloud5.png" alt="Cloud 5" layout="fill" objectFit="contain" className="absolute w-72 h-auto opacity-65 animate-cloud-move" style={{ top: '25%', animationDuration: '28s', animationDelay: '3s' }} />
-          <Image src="/images/cloud6.png" alt="Cloud 6" layout="fill" objectFit="contain" className="absolute w-60 h-auto opacity-45 animate-cloud-move" style={{ top: '70%', animationDuration: '30s', animationDelay: '5s' }} />
-          <Image src="/images/cloud7.png" alt="Cloud 7" layout="fill" objectFit="contain" className="absolute w-64 h-auto opacity-60 animate-cloud-move" style={{ top: '40%', animationDuration: '26s', animationDelay: '2.5s' }} />
-          <Image src="/images/cloud8.png" alt="Cloud 8" layout="fill" objectFit="contain" className="absolute w-80 h-auto opacity-50 animate-cloud-move" style={{ top: '10%', animationDuration: '29s', animationDelay: '6s' }} />
-          <Image src="/images/cloud9.png" alt="Cloud 9" layout="fill" objectFit="contain" className="absolute w-72 h-auto opacity-55 animate-cloud-move" style={{ top: '80%', animationDuration: '24s', animationDelay: '7s' }} />
-          <Image src="/images/cloud10.png" alt="Cloud 10" layout="fill" objectFit="contain" className="absolute w-64 h-auto opacity-60 animate-cloud-move" style={{ top: '5%', animationDuration: '27s', animationDelay: '8s' }} />
-          <Image src="/images/cloud11.png" alt="Cloud 11" layout="fill" objectFit="contain" className="absolute w-80 h-auto opacity-50 animate-cloud-move" style={{ top: '90%', animationDuration: '32s', animationDelay: '9s' }} />
-          <Image src="/images/cloud12.png" alt="Cloud 12" layout="fill" objectFit="contain" className="absolute w-56 h-auto opacity-65 animate-cloud-move" style={{ top: '20%', animationDuration: '21s', animationDelay: '10s' }} />
-          <Image src="/images/cloud13.png" alt="Cloud 13" layout="fill" objectFit="contain" className="absolute w-60 h-auto opacity-45 animate-cloud-move" style={{ top: '75%', animationDuration: '31s', animationDelay: '11s' }} />
-          <Image src="/images/cloud14.png" alt="Cloud 14" layout="fill" objectFit="contain" className="absolute w-72 h-auto opacity-55 animate-cloud-move" style={{ top: '45%', animationDuration: '28s', animationDelay: '12s' }} />
-          <Image src="/images/cloud15.png" alt="Cloud 15" layout="fill" objectFit="contain" className="absolute w-64 h-auto opacity-60 animate-cloud-move" style={{ top: '30%', animationDuration: '26s', animationDelay: '13s' }} />
-          <Image src="/images/cloud16.png" alt="Cloud 16" layout="fill" objectFit="contain" className="absolute w-80 h-auto opacity-50 animate-cloud-move" style={{ top: '65%', animationDuration: '30s', animationDelay: '14s' }} />
-          <Image src="/images/cloud17.png" alt="Cloud 17" layout="fill" objectFit="contain" className="absolute w-52 h-auto opacity-60 animate-cloud-move" style={{ top: '12%', animationDuration: '22s', animationDelay: '15s' }} />
-          <Image src="/images/cloud18.png" alt="Cloud 18" layout="fill" objectFit="contain" className="absolute w-56 h-auto opacity-55 animate-cloud-move" style={{ top: '85%', animationDuration: '25s', animationDelay: '16s' }} />
-          <Image src="/images/cloud19.png" alt="Cloud 19" layout="fill" objectFit="contain" className="absolute w-72 h-auto opacity-65 animate-cloud-move" style={{ top: '55%', animationDuration: '29s', animationDelay: '17s' }} />
-          <Image src="/images/cloud20.png" alt="Cloud 20" layout="fill" objectFit="contain" className="absolute w-60 h-auto opacity-45 animate-cloud-move" style={{ top: '22%', animationDuration: '27s', animationDelay: '18s' }} />
-        </div>
-        {/* Cloud Animation Keyframes */}
-        <style jsx global>{`
-          @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-30px); }
-            100% { transform: translateY(0px); }
-          }
-          @keyframes cloud-move {
-            0% { left: -300px; }
-            100% { left: 110vw; }
-          }
-          .animate-cloud-move {
-            animation: cloud-move 22s linear infinite;
-          }
-        `}</style>
-        <div className="absolute inset-0 bg-blue-900/60 z-0"></div>
+      <section className="relative min-h-[100vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8">
+        {/* Video Background */}
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          src="/images/Backgound-video.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
+        <div className="absolute inset-0 bg-blue-900/60 z-10"></div>
         <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between h-full px-2 sm:px-4 md:px-8">
-          {/* Left: Text */}
-          <div className="w-full lg:w-1/2 text-[#4f1032] text-center lg:text-left flex flex-col justify-center items-center lg:items-start py-8 sm:py-12 lg:py-20">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight">A Lifetime Of Discounts? It's Genius.</h1>
-            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-xl">Get rewarded for your travels unlock savings of 10% or more with free flight booker account.</p>
-          </div>
-          {/* Right: Floating Image */}
-          <div className="w-full lg:w-1/2 flex justify-center items-center relative mt-6 sm:mt-8 lg:mt-0 bg-transparent">
-            <img
-              src="/images/hero-bg.png"
-              alt="Flying Hero"
-              className="w-[90%] sm:w-[85%] md:w-[70%] lg:w-[600px] max-w-xs sm:max-w-md md:max-w-lg lg:max-w-none rounded-xl animate-float"
-              style={{ animation: 'float 3s ease-in-out infinite', objectFit: 'contain' }}
-            />
+          {/* Centered Hero Text */}
+          <div className="w-full flex flex-col justify-center items-center py-8 sm:py-12 lg:py-20 text-center">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-white">A Lifetime Of Discounts? It's Genius.</h1>
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-xl text-white">Get rewarded for your travels unlock savings of 10% or more with free flight booker account.</p>
           </div>
         </div>
       </section>
@@ -700,29 +626,34 @@ export default function HomePage() {
                   className="bg-[#cd7e0f] text-white px-4 py-2 rounded hover:bg-[#cd7e0f]/90"
                   onClick={async () => {
                     setError("");
-                    const { data } = await supabase.auth.getUser();
-                    if (!data?.user) {
+                    // TODO: Replace with your own authentication logic
+                    const userEmail = window.localStorage.getItem("user_email");
+                    if (!userEmail) {
                       setError("You must sign up or log in before you can book this flight.");
                       return;
                     }
-                    // Create booking in Supabase
-                    const { error: bookingError, data: bookingData } = await supabase
-                      .from("bookings")
-                      .insert([
-                        {
+                    // Create booking in MySQL (should be done via API route)
+                    try {
+                      // Example: POST to /api/bookings with booking data
+                      const response = await fetch("/api/bookings", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
                           flight_id: flight.id,
-                          passenger_name: data.user.email,
+                          passenger_name: userEmail,
                           paid: false,
                           created_at: new Date().toISOString(),
-                        }
-                      ])
-                      .select()
-                      .single();
-                    if (bookingError) {
+                        }),
+                      });
+                      const bookingData = await response.json();
+                      if (!response.ok) {
+                        setError("Failed to create booking. Please try again.");
+                        return;
+                      }
+                      setBooking(bookingData);
+                    } catch (err) {
                       setError("Failed to create booking. Please try again.");
-                      return;
                     }
-                    setBooking(bookingData);
                   }}
                 >
                   Book This Flight

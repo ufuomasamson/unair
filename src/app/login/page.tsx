@@ -1,7 +1,6 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -16,49 +15,61 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     setSuccess("");
-    
-    const { data, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    
-    if (signInError) {
-      setError(signInError.message);
-      setLoading(false);
-      return;
-    }
-    
-    // Fetch user role from users table
-    const userId = data.user?.id;
-    if (!userId) {
-      setError("User not found");
-      setLoading(false);
-      return;
-    }
-    
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    try {
+      // Import Supabase client
+      const { supabase } = await import('@/lib/supabaseClient');
+      console.log("Signing in with Supabase directly from client");
       
-    if (userError || !userData) {
-      setError("Could not fetch user role");
-      setLoading(false);
-      return;
-    }
-    
-    setSuccess(`Welcome back! Redirecting to ${userData.role === "admin" ? "admin dashboard" : "flights page"}...`);
-    
-    // Redirect based on role after a short delay
-    setTimeout(() => {
-      if (userData.role === "admin") {
-        router.push("/admin/dashboard");
-      } else {
-        router.push("/search");
+      // Sign in directly with Supabase client
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      
+      if (error) {
+        console.error("Supabase login error:", error);
+        setError(error.message || "Login failed");
+        setLoading(false);
+        return;
       }
-    }, 1500);
-    
+      
+      console.log("Login successful:", data);
+      
+      // Get user metadata (including role)
+      const userData = data.user.user_metadata;
+      const role = userData?.role || 'user';
+      
+      // Set user cookie for server components
+      try {
+        const cookieResponse = await fetch('/api/set-user-cookie', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ session: data }),
+        });
+        
+        if (!cookieResponse.ok) {
+          console.error('Failed to set user cookie');
+        } else {
+          console.log('User cookie set successfully');
+        }
+      } catch (cookieError) {
+        console.error('Error setting user cookie:', cookieError);
+      }
+      
+      setSuccess(`Welcome back! Redirecting...`);
+      setTimeout(() => {
+        // Force reload so server components re-read cookies
+        if (role === "admin") {
+          window.location.href = "/admin/dashboard";
+        } else {
+          window.location.href = "/search";
+        }
+      }, 1500);
+    } catch (err) {
+      setError("An unexpected error occurred");
+    }
     setLoading(false);
   };
 
@@ -70,7 +81,6 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold text-[#4f1032] mb-2">Welcome Back</h1>
             <p className="text-gray-600">Sign in to your account to continue</p>
           </div>
-          
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -85,7 +95,6 @@ export default function LoginPage() {
                 required
               />
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -99,19 +108,16 @@ export default function LoginPage() {
                 required
               />
             </div>
-            
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
-            
             {success && (
               <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
                 {success}
               </div>
             )}
-            
             <button
               type="submit"
               className="w-full bg-[#cd7e0f] text-white py-3 rounded-lg font-semibold hover:bg-[#cd7e0f]/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
@@ -120,7 +126,6 @@ export default function LoginPage() {
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
-          
           <div className="mt-6 text-center">
             <p className="text-gray-600">
               Don't have an account?{" "}
@@ -129,8 +134,22 @@ export default function LoginPage() {
               </a>
             </p>
           </div>
+          
+          {/* Debug tools */}
+          <div className="mt-6 border-t pt-4">
+            <p className="text-xs text-gray-500">Troubleshooting</p>
+            <div className="mt-1">
+              <a 
+                href="/debug" 
+                className="text-xs text-blue-600 hover:text-blue-800"
+                target="_blank"
+              >
+                Open Supabase Debug Page
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-} 
+}

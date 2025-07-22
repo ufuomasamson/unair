@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/supabaseClient';
+import { databases, DATABASE_ID, COLLECTIONS } from '@/lib/appwriteClient';
+import { ID, Query } from 'appwrite';
 
 export async function POST(request: Request) {
   try {
@@ -19,23 +20,51 @@ export async function POST(request: Request) {
     for (const keyData of keys) {
       console.log('Saving key:', keyData.type);
       
-      const { data, error } = await supabase
-        .from('payment_gateways')
-        .upsert(keyData, { onConflict: 'name,type' });
+      try {
+        // Check if the payment gateway already exists
+        const existingGateways = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTIONS.PAYMENT_GATEWAYS,
+          [
+            Query.equal('name', keyData.name),
+            Query.equal('type', keyData.type)
+          ]
+        );
+        
+        let data;
+        
+        if (existingGateways.documents.length > 0) {
+          // Update existing gateway
+          data = await databases.updateDocument(
+            DATABASE_ID,
+            COLLECTIONS.PAYMENT_GATEWAYS,
+            existingGateways.documents[0].$id,
+            keyData
+          );
+        } else {
+          // Create new gateway
+          data = await databases.createDocument(
+            DATABASE_ID,
+            COLLECTIONS.PAYMENT_GATEWAYS,
+            ID.unique(),
+            keyData
+          );
+        }
       
-      if (error) {
-        console.error('Error saving key:', keyData.type, error);
-        results.push({
-          type: keyData.type,
-          success: false,
-          error: error.message
-        });
-      } else {
+        // Success case
         console.log('Successfully saved key:', keyData.type);
         results.push({
           type: keyData.type,
           success: true,
           data
+        });
+      } catch (error: any) {
+        // Error case
+        console.error('Error saving key:', keyData.type, error);
+        results.push({
+          type: keyData.type,
+          success: false,
+          error: error.message || 'Failed to save key'
         });
       }
     }

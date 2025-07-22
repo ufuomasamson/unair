@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { supabase } from '@/supabaseClient';
+
 
 export default function PaymentIntegrations() {
   // Test Keys
@@ -21,40 +21,36 @@ export default function PaymentIntegrations() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
+    // Cookie-based admin check (same as dashboard)
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      if (userObj.role !== 'admin') {
+        window.location.href = '/search';
+        return;
+      }
+    } catch {
+      window.location.href = '/login';
+      return;
+    }
+    // Fetch API keys from custom API route
     const fetchApiKeys = async () => {
       try {
-        console.log('Fetching API keys...');
-        
-        // First, let's check if the table exists and its structure
-        const { data: tableInfo, error: tableError } = await supabase
-          .from('payment_gateways')
-          .select('*')
-          .limit(1);
-        
-        console.log('Table check result:', { tableInfo, tableError });
-        
-        const { data, error } = await supabase
-          .from('payment_gateways')
-          .select('*')
-          .eq('name', 'flutterwave');
-        
-        console.log('Fetch result:', { data, error });
-        
-        if (error && error.code !== 'PGRST116') { // Ignore no rows found error
-          throw error;
-        }
-
-        if (data && data.length > 0) {
+        const response = await fetch('/api/payment');
+        const data = await response.json();
+        if (data && Array.isArray(data)) {
           // Test Keys
           const testPublic = data.find(item => item.type === 'test_public')?.api_key || '';
           const testSecret = data.find(item => item.type === 'test_secret')?.api_key || '';
           const testEncryption = data.find(item => item.type === 'test_encryption')?.api_key || '';
-          
           // Live Keys
           const livePublic = data.find(item => item.type === 'live_public')?.api_key || '';
           const liveSecret = data.find(item => item.type === 'live_secret')?.api_key || '';
           const liveEncryption = data.find(item => item.type === 'live_encryption')?.api_key || '';
-          
           setFlutterwaveTestPublicKey(testPublic);
           setFlutterwaveTestSecretKey(testSecret);
           setFlutterwaveTestEncryptionKey(testEncryption);
@@ -69,7 +65,6 @@ export default function PaymentIntegrations() {
         setLoading(false);
       }
     };
-
     fetchApiKeys();
   }, []);
 

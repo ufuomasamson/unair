@@ -1,21 +1,26 @@
 {
-  "name": "flights",
+  "name": "united-airline",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "start": "node server.js",
+    "start:next": "next start",
+    "lint": "next lint",
+    "cpanel:deploy": "npm install && npm run build && node server.js"
   },
   "dependencies": {
-    "@supabase/ssr": "^0.6.1",
-    "@supabase/supabase-js": "^2.50.2",
+    "@supabase/supabase-js": "^2.52.0",
     "@types/uuid": "^10.0.0",
+    "appwrite": "^18.1.1",
+    "bcryptjs": "^3.0.2",
     "flutterwave-node-v3": "^1.3.0",
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.3",
     "jspdf": "^3.0.1",
+    "mysql2": "^3.14.2",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

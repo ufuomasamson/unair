@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/supabaseClient";
 import { v4 as uuidv4 } from "uuid";
 
 export default function CreateFlightPage() {
@@ -15,6 +14,7 @@ export default function CreateFlightPage() {
   const [trip, setTrip] = useState("One-way");
   const [tourType, setTourType] = useState("Economy");
   const [passengerClass, setPassengerClass] = useState("1 Passenger, Economy");
+  const [passengerName, setPassengerName] = useState("");
   const [airlines, setAirlines] = useState<any[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -25,31 +25,38 @@ export default function CreateFlightPage() {
 
   useEffect(() => {
     // Protect route: only admin
-    const checkRoleAndFetch = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('user='));
+    if (!cookie) {
+      router.replace('/login');
+      return;
+    }
+    try {
+      const userObj = JSON.parse(decodeURIComponent(cookie.split('=')[1]));
+      if (userObj.role !== 'admin') {
+        router.replace('/search');
         return;
       }
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
-      if (error || !data || data.role !== "admin") {
-        router.replace("/search");
-        return;
+    } catch {
+      router.replace('/login');
+      return;
+    }
+    // Fetch airlines and locations from API
+    const fetchData = async () => {
+      try {
+        const [airlinesRes, locationsRes] = await Promise.all([
+          fetch('/api/airlines'),
+          fetch('/api/locations')
+        ]);
+        const airlinesData = await airlinesRes.json();
+        const locationsData = await locationsRes.json();
+        setAirlines(airlinesData || []);
+        setLocations(locationsData || []);
+      } catch (err) {
+        setError('Failed to fetch airlines or locations');
       }
-      // Fetch airlines and locations
-      const [{ data: airlinesData }, { data: locationsData }] = await Promise.all([
-        supabase.from("airlines").select("id, name"),
-        supabase.from("locations").select("id, city, country")
-      ]);
-      setAirlines(airlinesData || []);
-      setLocations(locationsData || []);
       setLoading(false);
     };
-    checkRoleAndFetch();
+    fetchData();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,37 +64,33 @@ export default function CreateFlightPage() {
     setError("");
     setSuccess("");
     setSubmitting(true);
-    
     // Generate unique tracking number
     const trackingNumber = uuidv4().slice(0, 8).toUpperCase();
-    
     try {
-      const { error: insertError } = await supabase.from("flights").insert([
-        {
+      const res = await fetch('/api/flights', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           flight_number: flightNumber,
           airline_id: airlineId,
           departure_location_id: departureId,
           arrival_location_id: arrivalId,
           date,
           time,
-          price: Number(price),
+          price: parseFloat(Number(price).toFixed(2)),
           tracking_number: trackingNumber,
           ticket_url: null,
           trip,
           tour_type: tourType,
-          passenger_class: passengerClass
-        }
-      ]);
-      
-      if (insertError) {
-        setError("Error creating flight: " + insertError.message);
-        setSubmitting(false);
-        return;
+          passenger_class: passengerClass,
+          passenger_name: passengerName
+        })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to create flight');
       }
-      
-      setSuccess("Flight created successfully! Tracking number: " + trackingNumber);
-      
-      // Reset form
+      setSuccess('Flight created successfully!');
       setFlightNumber("");
       setAirlineId("");
       setDepartureId("");
@@ -95,16 +98,13 @@ export default function CreateFlightPage() {
       setDate("");
       setTime("");
       setPrice("");
-      
-      // Redirect after a delay
-      setTimeout(() => {
-        router.push("/admin/dashboard");
-      }, 2000);
-      
-    } catch (err) {
-      setError("An unexpected error occurred");
+      setTrip("One-way");
+      setTourType("Economy");
+      setPassengerClass("1 Passenger, Economy");
+      setPassengerName("");
+    } catch (err: any) {
+      setError(err.message || 'An error occurred');
     }
-    
     setSubmitting(false);
   };
 
@@ -118,6 +118,9 @@ export default function CreateFlightPage() {
       </div>
     );
   }
+
+  // ...existing code for the form UI and rendering...
+// ...existing code above...
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
@@ -143,6 +146,19 @@ export default function CreateFlightPage() {
         <div className="bg-white rounded-lg shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Passenger Name *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter passenger name"
+                  value={passengerName}
+                  onChange={e => setPassengerName(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#cd7e0f] focus:border-[#cd7e0f] transition text-gray-900"
+                  required
+                />
+              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Flight Number *

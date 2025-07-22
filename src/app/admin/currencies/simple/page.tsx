@@ -10,17 +10,19 @@ export default function SimpleCurrencyPage() {
 
   useEffect(() => {
     const checkRole = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.replace("/login");
-        return;
-      }
-      
-      const { data, error } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+      try {
+        // Get user ID from session or local storage
+        const userId = localStorage.getItem('userId');
+        if (!userId) {
+          router.replace("/login");
+          return;
+        }
+        
+        const { data, error } = await supabase
+          .from("users")
+          .select("role")
+          .eq("id", userId)
+          .single();
         
       if (error || !data || data.role !== "admin") {
         router.replace("/search");
@@ -29,6 +31,10 @@ export default function SimpleCurrencyPage() {
       
       setIsAdmin(true);
       setLoading(false);
+      } catch (error) {
+        console.error("Error checking user role:", error);
+        router.replace("/login");
+      }
     };
     
     checkRole();
