@@ -112,6 +112,7 @@ export default function LogoutTest() {
   );
 }
 
-export const metadata = {
-  title: 'Logout Testing Tool',
-};
+// Metadata cannot be exported from client components
+// export const metadata = {
+//   title: 'Logout Testing Tool',
+// };

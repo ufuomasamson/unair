@@ -231,6 +231,7 @@ export default function AdminRoleSetter() {
   );
 }
 
-export const metadata = {
-  title: 'User Role Management',
-};
+// Metadata cannot be exported from client components
+// export const metadata = {
+//   title: 'User Role Management',
+// };

@@ -107,6 +107,15 @@ export async function GET() {
           `
         }
       );
+      
+      if (alterError) {
+        return NextResponse.json({
+          success: false,
+          message: "Failed to add email column to users table",
+          error: alterError.message
+        }, { status: 500 });
+      }
+    }
     
     // Everything is already set up correctly
     return NextResponse.json({
