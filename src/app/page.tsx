@@ -121,16 +121,14 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative min-h-[85vh] md:min-h-[100vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8 overflow-hidden">
         {/* Video Background */}
-        <div className="hero-video-container absolute inset-0">
-          <video
-            className="absolute inset-0 w-full h-full md:object-cover object-contain z-0"
-            src="/images/Backgound-video.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-          />
-        </div>
+        <video
+          className="absolute inset-0 w-full h-full object-cover z-0"
+          src="/images/Backgound-video.mp4"
+          autoPlay
+          loop
+          muted
+          playsInline
+        />
         <div className="absolute inset-0 bg-blue-900/60 z-10"></div>
         <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between h-full px-2 sm:px-4 md:px-8">
           {/* Centered Hero Text */}
