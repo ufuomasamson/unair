@@ -119,7 +119,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative min-h-[85vh] md:min-h-[100vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8 overflow-hidden">
+      <section className="relative min-h-[100vh] flex flex-col lg:flex-row items-center justify-center px-2 sm:px-4 md:px-8">
         {/* Video Background */}
         <video
           className="absolute inset-0 w-full h-full object-cover z-0"
@@ -132,7 +132,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-blue-900/60 z-10"></div>
         <div className="relative z-20 w-full max-w-6xl mx-auto flex flex-col lg:flex-row items-center justify-between h-full px-2 sm:px-4 md:px-8">
           {/* Centered Hero Text */}
-          <div className="w-full flex flex-col justify-center items-center py-6 sm:py-10 lg:py-16 text-center mt-4 md:mt-0">
+          <div className="w-full flex flex-col justify-center items-center py-8 sm:py-12 lg:py-20 text-center">
             <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 leading-tight text-white">A Lifetime Of Discounts? It's Genius.</h1>
             <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 sm:mb-8 max-w-xl text-white">Get rewarded for your travels unlock savings of 10% or more with free United Airline account.</p>
           </div>
