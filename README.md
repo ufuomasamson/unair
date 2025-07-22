@@ -1,4 +1,4 @@
-# 🛫 United Airline Flight Booking
+# 🛫 United Airline
 
 A modern, full-stack flight booking application built with Next.js, Supabase, and Flutterwave payment integration.
 
