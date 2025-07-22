@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "name": "unitedair",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
