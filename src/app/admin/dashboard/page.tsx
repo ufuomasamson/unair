@@ -415,6 +415,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteWallet = async (id: any) => {
+    if (!window.confirm('Are you sure you want to delete this crypto wallet?')) return;
+    try {
+      const res = await fetch(`/api/crypto-wallets/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error(await res.text());
+      
+      // Refresh wallets list
+      fetchCryptoWallets();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete wallet');
+    }
+  };
+
   const handleApprovePayment = async (id: any) => {
     if (!id) {
       console.error('Payment ID is undefined');
@@ -714,19 +727,19 @@ export default function AdminDashboard() {
                 <p className="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Dashboard</p>
               </div>
               <div className="flex flex-wrap gap-4 p-4">
-                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#442743]">
+                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#030338]">
                   <p className="text-white text-base font-medium">Total Bookings</p>
                   <p className="text-white tracking-light text-2xl font-bold">{stats.totalBookings}</p>
                 </div>
-                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#442743]">
+                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#030338]">
                   <p className="text-white text-base font-medium">Total Revenue</p>
                   <p className="text-white tracking-light text-2xl font-bold">${Number(stats.totalRevenue).toFixed(2)}</p>
                 </div>
-                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#442743]">
+                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#030338]">
                   <p className="text-white text-base font-medium">Total Flight Value</p>
                   <p className="text-white tracking-light text-2xl font-bold">${Number(stats.totalFlightValue).toFixed(2)}</p>
                 </div>
-                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#442743]">
+                <div className="flex min-w-[158px] flex-1 flex-col gap-2 rounded-lg p-6 bg-[#030338]">
                   <p className="text-white text-base font-medium">Total Users</p>
                   <p className="text-white tracking-light text-2xl font-bold">{stats.totalUsers}</p>
                 </div>
@@ -741,7 +754,7 @@ export default function AdminDashboard() {
                 <div className="text-gray-300 text-lg">No flights found.</div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full bg-[#442743] rounded-lg">
+                  <table className="min-w-full bg-[#030338] rounded-lg">
                     <thead>
                       <tr className="text-white text-left">
                         <th className="py-2 px-4">Flight #</th>
@@ -984,7 +997,7 @@ export default function AdminDashboard() {
                 <div className="text-gray-300 text-lg">No pending payments found.</div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="min-w-full bg-[#442743] rounded-lg">
+                  <table className="min-w-full bg-[#030338] rounded-lg">
                     <thead>
                       <tr className="text-white text-left">
                         <th className="py-2 px-4">Payment ID</th>
@@ -1044,8 +1057,17 @@ export default function AdminDashboard() {
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {cryptoWallets.map(wallet => (
-                      <div key={wallet.id} className="bg-[#442743] rounded-lg p-6 flex flex-col gap-2">
-                        <span className="font-bold text-[#cd7e0f] text-lg">{wallet.name}</span>
+                      <div key={wallet.id} className="bg-[#030338] rounded-lg p-6 flex flex-col gap-2 relative">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-bold text-[#cd7e0f] text-lg">{wallet.name}</span>
+                          <button
+                            onClick={() => handleDeleteWallet(wallet.id)}
+                            className="bg-red-600 text-white px-2 py-1 rounded text-xs hover:bg-red-700 transition"
+                            title="Delete wallet"
+                          >
+                            Delete
+                          </button>
+                        </div>
                         <span className="text-white text-sm">Network: {wallet.network}</span>
                         <span className="text-white text-sm break-all">Address: {wallet.address || wallet.wallet_address}</span>
                         {wallet.qr_code_url && (
@@ -1062,7 +1084,7 @@ export default function AdminDashboard() {
           {selectedPage === 'integrations' && (
             <div className="p-8">
               <h2 className="text-white text-2xl font-bold mb-6">Integrations</h2>
-              <div className="bg-[#442743] rounded-lg p-6 mb-6">
+              <div className="bg-[#030338] rounded-lg p-6 mb-6">
                 <p className="text-white text-base mb-2">Connect your admin dashboard to external services for payments, notifications, and more.</p>
                 <ul className="space-y-4">
                   {/* Example integrations, replace with real data if available */}
@@ -1115,7 +1137,7 @@ export default function AdminDashboard() {
                   <div className="text-gray-300 text-lg">No locations found.</div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="min-w-full bg-[#442743] rounded-lg">
+                    <table className="min-w-full bg-[#030338] rounded-lg">
                       <thead>
                         <tr className="text-white text-left">
                           <th className="py-2 px-4">City</th>
