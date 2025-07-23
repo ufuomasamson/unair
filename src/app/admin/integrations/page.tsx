@@ -211,7 +211,7 @@ export default function PaymentIntegrations() {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
-          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#4f1032] focus:border-transparent"
+          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#18176b] focus:border-transparent"
         />
       </div>
       
@@ -230,8 +230,8 @@ export default function PaymentIntegrations() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f1032] mx-auto mb-4"></div>
-          <p className="text-[#4f1032] font-semibold">Loading Integrations...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#18176b] mx-auto mb-4"></div>
+          <p className="text-[#18176b] font-semibold">Loading Integrations...</p>
         </div>
       </div>
     );
@@ -240,7 +240,7 @@ export default function PaymentIntegrations() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-4 sm:py-8">
+      <div className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-4 sm:py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
@@ -259,7 +259,7 @@ export default function PaymentIntegrations() {
 
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8">
-          <h2 className="text-xl sm:text-2xl font-bold text-[#4f1032] mb-6">Flutterwave Configuration</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-[#18176b] mb-6">Flutterwave Configuration</h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Test Keys Section */}
@@ -392,7 +392,7 @@ export default function PaymentIntegrations() {
             <button
               onClick={handleSave}
               disabled={savingAll}
-              className="px-6 py-3 bg-[#4f1032] text-white rounded-lg hover:bg-[#4f1032]/90 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+              className="px-6 py-3 bg-[#18176b] text-white rounded-lg hover:bg-[#18176b]/90 transition disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
             >
               {savingAll ? 'Saving All Keys...' : 'Save All API Keys'}
             </button>

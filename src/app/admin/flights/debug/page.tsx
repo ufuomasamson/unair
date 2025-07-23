@@ -29,8 +29,8 @@ export default function FlightDebugPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f1032] mx-auto mb-4"></div>
-          <p className="text-[#4f1032] font-semibold text-lg">Loading Flight Data...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#18176b] mx-auto mb-4"></div>
+          <p className="text-[#18176b] font-semibold text-lg">Loading Flight Data...</p>
         </div>
       </div>
     );
@@ -47,7 +47,7 @@ export default function FlightDebugPage() {
           <p className="text-red-600 font-medium">{error}</p>
           <button 
             onClick={() => window.location.reload()}
-            className="mt-6 bg-[#4f1032] text-white px-6 py-2 rounded-lg hover:bg-[#4f1032]/90 transition"
+            className="mt-6 bg-[#18176b] text-white px-6 py-2 rounded-lg hover:bg-[#18176b]/90 transition"
           >
             Try Again
           </button>

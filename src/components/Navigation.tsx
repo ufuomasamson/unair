@@ -37,7 +37,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
   };
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#4f1032]">
+    <nav className="sticky top-0 z-50 bg-[#18176b]">
       <div className="flex items-center justify-between px-4 sm:px-8 py-4">
         <Link href="/" className="text-xl sm:text-2xl font-bold text-white tracking-tight">United Airline</Link>
         
@@ -59,7 +59,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
               <select 
                 onChange={(e) => handleCurrencyChange(e.target.value)} 
                 value={currency} 
-                className="bg-[#4f1032] text-white px-2 lg:px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-xs lg:text-sm"
+                className="bg-[#18176b] text-white px-2 lg:px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-xs lg:text-sm"
               >
                 {currencies.map((c) => (
                   <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
@@ -78,7 +78,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
         ) : (
           <div className="flex items-center gap-2">
               <Link href="/login" className="px-3 lg:px-4 py-1 lg:py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-xs lg:text-sm">Login</Link>
-              <Link href="/signup" className="px-3 lg:px-4 py-1 lg:py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-xs lg:text-sm">Sign Up</Link>
+              <Link href="/signup" className="px-3 lg:px-4 py-1 lg:py-2 border border-white text-white rounded hover:bg-white hover:text-[#18176b] transition text-xs lg:text-sm">Sign Up</Link>
           </div>
         )}
       </div>
@@ -102,7 +102,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-[#4f1032] border-t border-white/20">
+        <div className="md:hidden bg-[#18176b] border-t border-white/20">
           <div className="px-4 py-4 space-y-4">
             <div className="flex flex-col space-y-3">
               <Link href="/" className="text-white hover:text-[#cd7e0f] transition py-2">Home</Link>
@@ -124,7 +124,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
                   <select 
                     onChange={(e) => handleCurrencyChange(e.target.value)} 
                     value={currency} 
-                    className="bg-[#4f1032] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-sm"
+                    className="bg-[#18176b] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-sm"
                   >
                     {currencies.map((c) => (
                       <option key={c.code} value={c.code}>{c.symbol} {c.code}</option>
@@ -144,7 +144,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
             ) : (
               <div className="flex flex-col space-y-2 pt-4 border-t border-white/20">
                 <Link href="/login" className="px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition text-center text-sm">Login</Link>
-                <Link href="/signup" className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition text-center text-sm">Sign Up</Link>
+                <Link href="/signup" className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#18176b] transition text-center text-sm">Sign Up</Link>
               </div>
             )}
           </div>

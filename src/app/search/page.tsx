@@ -71,7 +71,7 @@ export default function SearchPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-20">
+      <section className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Find Your Perfect Flight</h1>
           <p className="text-xl">Search, compare, and book flights to destinations worldwide</p>
@@ -82,7 +82,7 @@ export default function SearchPage() {
       <section className="relative -mt-10 z-30 mb-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-2xl p-8">
-            <h2 className="text-2xl font-bold text-[#4f1032] mb-6 text-center">Search Flights</h2>
+            <h2 className="text-2xl font-bold text-[#18176b] mb-6 text-center">Search Flights</h2>
             
             <form onSubmit={handleSearch} className="space-y-6">
               {/* Trip Type */}
@@ -205,7 +205,7 @@ export default function SearchPage() {
       <section className="max-w-6xl mx-auto px-4 pb-16">
         {results.length > 0 && (
           <div>
-            <h2 className="text-2xl font-bold text-[#4f1032] mb-6">Available Flights</h2>
+            <h2 className="text-2xl font-bold text-[#18176b] mb-6">Available Flights</h2>
             <div className="grid grid-cols-1 gap-6">
               {results.map((flight, idx) => (
                 <div key={flight.id || idx} className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition">
@@ -249,7 +249,7 @@ export default function SearchPage() {
                       <div className="text-2xl font-bold text-[#cd7e0f] mb-2">${Number(flight.price).toFixed(2)}</div>
                       <a
                         href={`/pay/${flight.tracking_number}`}
-                        className="bg-[#4f1032] text-white px-6 py-2 rounded-lg hover:bg-[#4f1032]/90 transition"
+                        className="bg-[#18176b] text-white px-6 py-2 rounded-lg hover:bg-[#18176b]/90 transition"
                       >
                         Book Now
                       </a>
@@ -264,7 +264,7 @@ export default function SearchPage() {
         {results.length === 0 && !loading && (
           <div className="text-center py-16">
             <div className="text-6xl mb-4">✈️</div>
-            <h3 className="text-xl font-semibold text-[#4f1032] mb-2">No flights found</h3>
+            <h3 className="text-xl font-semibold text-[#18176b] mb-2">No flights found</h3>
             <p className="text-gray-600">Try adjusting your search criteria or dates</p>
           </div>
         )}

@@ -101,7 +101,7 @@ export default function PaymentButton({
         className={`w-full px-6 py-3 rounded-lg font-medium transition ${
           isLoading
             ? 'bg-gray-400 cursor-not-allowed'
-            : 'bg-[#4f1032] hover:bg-[#4f1032]/90 text-white'
+            : 'bg-[#18176b] hover:bg-[#18176b]/90 text-white'
         }`}
       >
         {isLoading ? (

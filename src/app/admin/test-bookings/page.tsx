@@ -46,7 +46,7 @@ export default function TestBookingsTable() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-8">
       <div className="max-w-3xl mx-auto bg-white rounded-lg shadow-lg p-8">
-        <h1 className="text-2xl font-bold mb-6 text-[#4f1032]">Supabase Bookings Table Test</h1>
+        <h1 className="text-2xl font-bold mb-6 text-[#18176b]">Supabase Bookings Table Test</h1>
         
         {error ? (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">

@@ -33,7 +33,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-20">
+      <section className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Get in Touch</h1>
           <p className="text-xl">We're here to help with all your travel needs. Contact us anytime!</p>
@@ -45,7 +45,7 @@ export default function ContactPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Form */}
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <h2 className="text-2xl font-bold text-[#4f1032] mb-6">Send us a Message</h2>
+            <h2 className="text-2xl font-bold text-[#18176b] mb-6">Send us a Message</h2>
             
             {success && (
               <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
@@ -137,10 +137,10 @@ export default function ContactPage() {
           <div className="space-y-8">
             {/* Quick Contact */}
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <h3 className="text-xl font-bold text-[#4f1032] mb-6">Quick Contact</h3>
+              <h3 className="text-xl font-bold text-[#18176b] mb-6">Quick Contact</h3>
               <div className="space-y-4">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center">
                     <span className="text-white text-xl">📞</span>
                   </div>
                   <div>
@@ -149,7 +149,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center">
                     <span className="text-white text-xl">✉️</span>
                   </div>
                   <div>
@@ -158,7 +158,7 @@ export default function ContactPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center">
+                  <div className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center">
                     <span className="text-white text-xl">📍</span>
                   </div>
                   <div>
@@ -171,7 +171,7 @@ export default function ContactPage() {
 
             {/* Office Hours */}
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <h3 className="text-xl font-bold text-[#4f1032] mb-6">Office Hours</h3>
+              <h3 className="text-xl font-bold text-[#18176b] mb-6">Office Hours</h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
                   <span>Monday - Friday</span>
@@ -195,18 +195,18 @@ export default function ContactPage() {
 
             {/* Social Media */}
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <h3 className="text-xl font-bold text-[#4f1032] mb-6">Follow Us</h3>
+              <h3 className="text-xl font-bold text-[#18176b] mb-6">Follow Us</h3>
               <div className="flex gap-4">
-                <a href="#" className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
+                <a href="#" className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
                   <span className="text-white text-xl">📘</span>
                 </a>
-                <a href="#" className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
+                <a href="#" className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
                   <span className="text-white text-xl">📷</span>
                 </a>
-                <a href="#" className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
+                <a href="#" className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
                   <span className="text-white text-xl">🐦</span>
                 </a>
-                <a href="#" className="w-12 h-12 bg-[#4f1032] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
+                <a href="#" className="w-12 h-12 bg-[#18176b] rounded-full flex items-center justify-center hover:bg-[#cd7e0f] transition">
                   <span className="text-white text-xl">💼</span>
                 </a>
               </div>
@@ -216,22 +216,22 @@ export default function ContactPage() {
 
         {/* FAQ Section */}
         <section className="mt-16">
-          <h2 className="text-3xl font-bold text-center text-[#4f1032] mb-12">Frequently Asked Questions</h2>
+          <h2 className="text-3xl font-bold text-center text-[#18176b] mb-12">Frequently Asked Questions</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="font-bold text-[#4f1032] mb-2">How do I book a flight?</h3>
+              <h3 className="font-bold text-[#18176b] mb-2">How do I book a flight?</h3>
               <p className="text-gray-600">You can book a flight through our website by searching for available flights and completing the booking process online.</p>
             </div>
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="font-bold text-[#4f1032] mb-2">Can I cancel my booking?</h3>
+              <h3 className="font-bold text-[#18176b] mb-2">Can I cancel my booking?</h3>
               <p className="text-gray-600">Yes, you can cancel your booking within 24 hours of purchase for a full refund, subject to airline policies.</p>
             </div>
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="font-bold text-[#4f1032] mb-2">How do I track my flight?</h3>
+              <h3 className="font-bold text-[#18176b] mb-2">How do I track my flight?</h3>
               <p className="text-gray-600">Use your tracking number on our homepage or dedicated tracking page to get real-time flight information.</p>
             </div>
             <div className="bg-white rounded-lg shadow-lg p-6">
-              <h3 className="font-bold text-[#4f1032] mb-2">What payment methods do you accept?</h3>
+              <h3 className="font-bold text-[#18176b] mb-2">What payment methods do you accept?</h3>
               <p className="text-gray-600">We accept all major credit cards, debit cards, and digital payment methods including PayPal and Apple Pay.</p>
             </div>
           </div>

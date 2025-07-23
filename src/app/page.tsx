@@ -144,7 +144,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-white rounded-lg shadow-2xl p-4 sm:p-6 lg:p-8">
             <div className="text-center mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#4f1032] mb-2">UNITED AIRLINE</h2>
+              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-[#18176b] mb-2">UNITED AIRLINE</h2>
             </div>
             {/* Flight Booking Form */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
@@ -206,7 +206,7 @@ export default function HomePage() {
       {/* Search Results */}
       {searchResults.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-lg font-bold mb-4 text-[#4f1032]">Available Flights</h3>
+          <h3 className="text-lg font-bold mb-4 text-[#18176b]">Available Flights</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {searchResults.map(flight => (
               <div key={flight.id} className="bg-gray-50 rounded-lg shadow p-6">
@@ -231,15 +231,15 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="text-center p-6 border rounded-lg">
-              <h3 className="text-lg font-semibold text-[#4f1032] mb-2">International Flight</h3>
+              <h3 className="text-lg font-semibold text-[#18176b] mb-2">International Flight</h3>
               <p className="text-gray-600">Call FlyGlobe Inc via +447587623610 for booking assistance</p>
             </div>
             <div className="text-center p-6 border rounded-lg">
-              <h3 className="text-lg font-semibold text-[#4f1032] mb-2">Check Refund</h3>
+              <h3 className="text-lg font-semibold text-[#18176b] mb-2">Check Refund</h3>
               <p className="text-gray-600">Contact contact@flyglobe.online for check refund status</p>
             </div>
             <div className="text-center p-6 border rounded-lg">
-              <h3 className="text-lg font-semibold text-[#4f1032] mb-2">Offer Deals</h3>
+              <h3 className="text-lg font-semibold text-[#18176b] mb-2">Offer Deals</h3>
               <p className="text-gray-600">FlyGlobe Inc Offer Deals Best Price Guarantee</p>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function HomePage() {
       {/* Offer Deals */}
       <section className="py-8 sm:py-12 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#4f1032] mb-6 sm:mb-8">Offer Deals</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-[#18176b] mb-6 sm:mb-8">Offer Deals</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {/* Card 1: New York */}
             <div className="bg-white rounded-lg shadow flex flex-col overflow-hidden">
@@ -257,7 +257,7 @@ export default function HomePage() {
                 <img src="/images/new-york.jpeg" alt="New York" className="w-full h-full object-cover object-center rounded-t-lg" />
               </div>
               <div className="p-6 flex-1 flex flex-col justify-end">
-                <h3 className="font-semibold text-[#4f1032] mb-2">New York to California</h3>
+                <h3 className="font-semibold text-[#18176b] mb-2">New York to California</h3>
                 <p className="text-gray-600 mb-2">09 Jun 2022 - 16 Jun 2022</p>
                 <p className="text-gray-600 mb-2">Economy from</p>
                 <p className="text-2xl font-bold text-[#cd7e0f]">{formatPrice(290)}</p>
@@ -269,7 +269,7 @@ export default function HomePage() {
                 <img src="/images/paris.jpeg" alt="Paris" className="w-full h-full object-cover object-center rounded-t-lg" />
               </div>
               <div className="p-6 flex-1 flex flex-col justify-end">
-                <h3 className="font-semibold text-[#4f1032] mb-2">Paris to London</h3>
+                <h3 className="font-semibold text-[#18176b] mb-2">Paris to London</h3>
                 <p className="text-gray-600 mb-2">09 Jun 2022 - 16 Jun 2022</p>
                 <p className="text-gray-600 mb-2">Economy from</p>
                 <p className="text-2xl font-bold text-[#cd7e0f]">{formatPrice(420)}</p>
@@ -281,7 +281,7 @@ export default function HomePage() {
                 <img src="/images/tokyo.jpeg" alt="Tokyo" className="w-full h-full object-cover object-center rounded-t-lg" />
               </div>
               <div className="p-6 flex-1 flex flex-col justify-end">
-                <h3 className="font-semibold text-[#4f1032] mb-2">Tokyo to Seoul</h3>
+                <h3 className="font-semibold text-[#18176b] mb-2">Tokyo to Seoul</h3>
                 <p className="text-gray-600 mb-2">09 Jun 2022 - 16 Jun 2022</p>
                 <p className="text-gray-600 mb-2">Economy from</p>
                 <p className="text-2xl font-bold text-[#cd7e0f]">{formatPrice(350)}</p>
@@ -293,7 +293,7 @@ export default function HomePage() {
                 <img src="/images/dubai-city.jpeg" alt="Maldives" className="w-full h-full object-cover object-center rounded-t-lg" />
               </div>
               <div className="p-6 flex-1 flex flex-col justify-end">
-                <h3 className="font-semibold text-[#4f1032] mb-2">Dubai to Maldives</h3>
+                <h3 className="font-semibold text-[#18176b] mb-2">Dubai to Maldives</h3>
                 <p className="text-gray-600 mb-2">09 Jun 2022 - 16 Jun 2022</p>
                 <p className="text-gray-600 mb-2">Economy from</p>
                 <p className="text-2xl font-bold text-[#cd7e0f]">{formatPrice(980)}</p>
@@ -309,7 +309,7 @@ export default function HomePage() {
         style={{ backgroundImage: "url('/images/great.jpeg')" }}
       >
         <div
-          className="absolute inset-0 bg-[#4f1032]"
+          className="absolute inset-0 bg-[#18176b]"
           style={{
             maskImage: 'linear-gradient(to right, black 60%, transparent 100%)',
             WebkitMaskImage: 'linear-gradient(to right, black 60%, transparent 100%)',
@@ -349,7 +349,7 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-8">
             <h3 className="text-lg font-semibold text-[#cd7e0f]">Flynext Package</h3>
-            <h2 className="text-3xl font-bold text-[#4f1032]">Your Great Destination</h2>
+            <h2 className="text-3xl font-bold text-[#18176b]">Your Great Destination</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Card 1 */}
@@ -357,9 +357,9 @@ export default function HomePage() {
               <img src="/images/dubai-dxb.PNG" alt="Dubai" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2023 - 16 Jun 2023</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Dubai (DXB)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Dubai (DXB)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">New York (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">New York (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Economy from</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(195)}</p>
@@ -371,9 +371,9 @@ export default function HomePage() {
               <img src="/images/switzerland-swl.PNG" alt="Switzerland" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2022 - 16 Jun 2022</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Switzerland (SWL)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Switzerland (SWL)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">New York (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">New York (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(800)}</p>
@@ -385,9 +385,9 @@ export default function HomePage() {
               <img src="/images/denmark-dek.PNG" alt="Denmark" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2024 - 16 Jun 2024</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Denmark (DEK)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Denmark (DEK)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">New York (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">New York (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Economy from</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(350)}</p>
@@ -399,9 +399,9 @@ export default function HomePage() {
               <img src="/images/jakarta-dxb.PNG" alt="Jakarta" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2025 - 16 Jun 2025</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Jakarta (DXB)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Jakarta (DXB)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Miami (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Miami (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(220)}</p>
@@ -413,9 +413,9 @@ export default function HomePage() {
               <img src="/images/turkish-swk.PNG" alt="Turkey" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2024 - 16 Jun 2024</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Turkey (TUR)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Turkey (TUR)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">California (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">California (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(2430)}</p>
@@ -427,9 +427,9 @@ export default function HomePage() {
               <img src="/images/australia-stl.PNG" alt="Australia" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2024 - 16 Jun 2024</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Australia (AUS)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Australia (AUS)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Florida (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Florida (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(2220)}</p>
@@ -441,9 +441,9 @@ export default function HomePage() {
               <img src="/images/canada-cda.PNG" alt="Canada" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2024 - 16 Jun 2024</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Canada (CA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Canada (CA)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Florida (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Florida (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(820)}</p>
@@ -455,9 +455,9 @@ export default function HomePage() {
               <img src="/images/greece-gcc.PNG" alt="Greece" className="w-full h-48 object-cover"/>
               <div className="p-4">
                 <p className="text-sm text-gray-500">09 Jun 2024 - 16 Jun 2024</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Greece (GR)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Greece (GR)</h4>
                 <p className="text-gray-600">To</p>
-                <h4 className="font-bold text-lg text-[#4f1032]">Florida (USA)</h4>
+                <h4 className="font-bold text-lg text-[#18176b]">Florida (USA)</h4>
                 <div className="flex justify-between items-center mt-4">
                   <p className="text-gray-600">Business Class</p>
                   <p className="text-xl font-bold text-[#cd7e0f]">{formatPrice(820)}</p>
@@ -471,14 +471,14 @@ export default function HomePage() {
       {/* Latest News Update Section */}
       <section className="py-12 bg-white">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-[#4f1032] mb-8">Latest News Update</h2>
+          <h2 className="text-3xl font-bold text-center text-[#18176b] mb-8">Latest News Update</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Main Story */}
             <div className="lg:col-span-2 rounded-lg overflow-hidden shadow-lg">
               <img src="/images/usa.jpeg" alt="Airplane wing in the sky" className="w-full h-64 object-cover"/>
               <div className="p-6">
                 <p className="text-sm text-gray-600 mb-2">Emely Watson • February 19, 2022</p>
-                <h3 className="text-2xl font-bold text-[#4f1032] mb-4">The US is a Large Country and Climate Varies by Region</h3>
+                <h3 className="text-2xl font-bold text-[#18176b] mb-4">The US is a Large Country and Climate Varies by Region</h3>
                 <p className="text-gray-700">Discover the diverse climates of the United States, from the sunny beaches of California to the snowy mountains of Colorado. Plan your trip accordingly to make the most of your travels.</p>
               </div>
             </div>
@@ -488,14 +488,14 @@ export default function HomePage() {
                 <img src="/images/happy.png" alt="Airplane flying over clouds" className="w-full h-40 object-cover"/>
                 <div className="p-4">
                   <p className="text-sm text-gray-600 mb-1">Emely Watson • February 19, 2022</p>
-                  <h3 className="font-semibold text-[#4f1032]">Happy International Country Flight Attendant Day</h3>
+                  <h3 className="font-semibold text-[#18176b]">Happy International Country Flight Attendant Day</h3>
                 </div>
               </div>
               <div className="rounded-lg overflow-hidden shadow-lg">
                 <img src="/images/bestlow.jpg" alt="View from airplane window" className="w-full h-40 object-cover"/>
                 <div className="p-4">
                   <p className="text-sm text-gray-600 mb-1">Emely Watson • February 19, 2022</p>
-                  <h3 className="font-semibold text-[#4f1032]">But There are Dozen of Low-cost Airlines Including</h3>
+                  <h3 className="font-semibold text-[#18176b]">But There are Dozen of Low-cost Airlines Including</h3>
                 </div>
               </div>
             </div>
@@ -504,7 +504,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#4f1032] text-white py-12">
+      <footer className="bg-[#18176b] text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div>
@@ -548,7 +548,7 @@ export default function HomePage() {
       {flight && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4 text-[#4f1032]">Flight Details</h2>
+            <h2 className="text-2xl font-bold mb-4 text-[#18176b]">Flight Details</h2>
             <div className="flex items-center gap-4 mb-4">
               {/* Airline logo lookup by airline_id */}
               {(() => {

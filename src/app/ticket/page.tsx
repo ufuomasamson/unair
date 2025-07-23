@@ -115,7 +115,7 @@ export default function TicketPage() {
       />
       <button
         onClick={() => downloadTicket(ticketRef)}
-        className="mt-4 px-6 py-2 bg-[#4f1032] text-white rounded-lg font-semibold shadow hover:bg-[#6d1847] transition"
+        className="mt-4 px-6 py-2 bg-[#18176b] text-white rounded-lg font-semibold shadow hover:bg-[#1f1e89] transition"
       >
         Download Ticket
       </button>

@@ -60,8 +60,8 @@ export default function CreatedFlightsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f1032] mx-auto mb-4"></div>
-          <p className="text-[#4f1032] font-semibold">Loading Flights...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#18176b] mx-auto mb-4"></div>
+          <p className="text-[#18176b] font-semibold">Loading Flights...</p>
         </div>
       </div>
     );
@@ -69,7 +69,7 @@ export default function CreatedFlightsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
-      <div className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-8">
+      <div className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 flex justify-between items-center">
           <h1 className="text-3xl font-bold">Created Flights</h1>
           <button
@@ -89,7 +89,7 @@ export default function CreatedFlightsPage() {
                 className="p-6 border rounded-lg cursor-pointer hover:shadow-md"
                 onClick={() => setSelectedFlight(flight)}
               >
-                <h3 className="text-lg font-semibold text-[#4f1032] mb-2">
+                <h3 className="text-lg font-semibold text-[#18176b] mb-2">
                   {(flight.airline?.name || 'Airline ID: ' + flight.airline_id) + ' - ' + flight.flight_number}
                 </h3>
                 <p className="text-gray-600">
@@ -107,7 +107,7 @@ export default function CreatedFlightsPage() {
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl shadow-2xl p-8 max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100">
             <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-3xl font-bold text-[#4f1032]">Flight Details</h2>
+                <h2 className="text-3xl font-bold text-[#18176b]">Flight Details</h2>
                 <p className="text-gray-500">Complete information for the selected flight.</p>
               </div>
               <button 
@@ -125,7 +125,7 @@ export default function CreatedFlightsPage() {
                   <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
                 </div>
                 <div>
-                  <div className="font-bold text-2xl text-[#4f1032]">{selectedFlight.airline?.name || 'Airline ID: ' + selectedFlight.airline_id}</div>
+                  <div className="font-bold text-2xl text-[#18176b]">{selectedFlight.airline?.name || 'Airline ID: ' + selectedFlight.airline_id}</div>
                   <div className="text-gray-600">Flight No: <span className="font-mono bg-gray-100 px-2 py-1 rounded">{selectedFlight.flight_number}</span></div>
                 </div>
               </div>

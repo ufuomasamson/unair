@@ -100,7 +100,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {airlines.map((airline: any) => (
-                        <tr key={airline.id} className="border-b border-[#201320] text-white">
+                        <tr key={airline.id} className="border-b border-[#18176b] text-white">
                           <td className="py-2 px-4">{airline.name}</td>
                           <td className="py-2 px-4">
                             {airline.logo_url ? (
@@ -363,10 +363,11 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
-    <div className="relative flex min-h-screen flex-col bg-[#201320] font-sans overflow-x-hidden">
+    <div className="relative flex min-h-screen flex-col bg-[#18176b] font-sans overflow-x-hidden">
       <div className="flex h-full grow flex-row">
         {/* Sidebar */}
-        <aside className="flex flex-col w-80 min-h-screen bg-[#201320] p-4 justify-between">
+        <aside className="flex flex-col w-80 min-h-screen bg-[#18176b] p-4 justify-between border-r-4 border-gradient-to-b from-[#cd7e0f] via-[#d18a27] to-[#cd7e0f] shadow-lg relative">
+          <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-b from-[#cd7e0f] via-[#d18a27] to-[#cd7e0f]"></div>
           <div className="flex flex-col gap-4">
             <h1 className="text-white text-base font-medium">Welcome</h1>
             <nav className="flex flex-col gap-2">
@@ -496,7 +497,7 @@ export default function AdminDashboard() {
                         {flights.map((flight: any) => (
                           <tr
                             key={flight.id}
-                            className="border-b border-[#201320] text-white cursor-pointer hover:bg-[#cd7e0f]/20 transition"
+                            className="border-b border-[#18176b] text-white cursor-pointer hover:bg-[#cd7e0f]/20 transition"
                             onClick={() => {
                               setSelectedFlight(flight);
                               setShowFlightModal(true);
@@ -624,7 +625,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody>
                         {payments.map((payment: any) => (
-                          <tr key={payment.id} className="border-b border-[#201320] text-white">
+                          <tr key={payment.id} className="border-b border-[#18176b] text-white">
                             <td className="py-2 px-4">{payment.id}</td>
                             <td className="py-2 px-4">{payment.booking_id}</td>
                             <td className="py-2 px-4">{formatPrice(payment.amount)}</td>
@@ -806,7 +807,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {locations.map((loc: any) => (
-                        <tr key={loc.id} className="border-b border-[#201320] text-white">
+                        <tr key={loc.id} className="border-b border-[#18176b] text-white">
                           <td className="py-2 px-4">{loc.city}</td>
                           <td className="py-2 px-4">{loc.country}</td>
                           <td className="py-2 px-4 flex gap-2">

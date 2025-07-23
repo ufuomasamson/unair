@@ -640,10 +640,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col bg-[#201320] font-sans overflow-x-hidden">
+    <div className="relative flex min-h-screen flex-col bg-[#18176b] font-sans overflow-x-hidden">
       <div className="flex h-full grow flex-row">
         {/* Sidebar */}
-        <aside className="flex flex-col w-64 min-h-screen bg-[#201320] p-4 justify-between">
+        <aside className="flex flex-col w-64 min-h-screen bg-[#030338] p-4 justify-between border-r-4 border-gradient-to-b from-[#cd7e0f] via-[#d18a27] to-[#cd7e0f] shadow-lg relative before:absolute before:inset-y-0 before:right-0 before:w-1 before:bg-gradient-to-b before:from-[#cd7e0f] before:via-[#d18a27] before:to-[#cd7e0f] before:shadow-[0_0_10px_rgba(205,126,15,0.5)]">
+          <div className="absolute inset-y-0 right-0 w-1 bg-gradient-to-b from-[#cd7e0f] via-[#d18a27] to-[#cd7e0f] shadow-[0_0_10px_rgba(205,126,15,0.5)]"></div>
           <div className="flex flex-col gap-4">
             <h1 className="text-white text-xl font-medium">Admin Dashboard</h1>
             <nav className="flex flex-col gap-2">
@@ -706,7 +707,7 @@ export default function AdminDashboard() {
         </aside>
 
         {/* Main Content */}
-        <main className="flex flex-col flex-1 max-w-[960px] mx-auto">
+        <main className="flex flex-col flex-1 max-w-[960px] mx-auto bg-gradient-to-br from-[#18176b] to-[#1a1870] shadow-xl ml-2 rounded-l-xl">
           {selectedPage === 'dashboard' && (
             <div className="flex flex-col">
               <div className="flex flex-wrap justify-between gap-3 p-4">
@@ -756,7 +757,7 @@ export default function AdminDashboard() {
                       {flights.map((flight: any) => (
                         <tr
                           key={flight.id}
-                          className="border-b border-[#201320] text-white hover:bg-[#cd7e0f]/20 transition"
+                          className="border-b border-[#18176b] text-white hover:bg-[#cd7e0f]/20 transition"
                         >
                           <td 
                             className="py-2 px-4 cursor-pointer"
@@ -997,7 +998,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody>
                       {payments.map((payment: any) => (
-                        <tr key={payment.id || payment.payment_id} className="border-b border-[#201320] text-white">
+                        <tr key={payment.id || payment.payment_id} className="border-b border-[#18176b] text-white">
                           <td className="py-2 px-4">{payment.id || payment.payment_id}</td>
                           <td className="py-2 px-4">{payment.booking_id}</td>
                           <td className="py-2 px-4">${Number(payment.amount).toFixed(2)}</td>
@@ -1124,7 +1125,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody>
                         {locations.map((loc: any) => (
-                          <tr key={loc.id} className="border-b border-[#201320] text-white">
+                          <tr key={loc.id} className="border-b border-[#18176b] text-white">
                             <td className="py-2 px-4">{loc.city}</td>
                             <td className="py-2 px-4">{loc.country}</td>
                             <td className="py-2 px-4 flex gap-2">

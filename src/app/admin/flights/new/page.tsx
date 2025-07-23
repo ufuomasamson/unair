@@ -112,8 +112,8 @@ export default function CreateFlightPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f1032] mx-auto mb-4"></div>
-          <p className="text-[#4f1032] font-semibold">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#18176b] mx-auto mb-4"></div>
+          <p className="text-[#18176b] font-semibold">Loading...</p>
         </div>
       </div>
     );
@@ -125,7 +125,7 @@ export default function CreateFlightPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-8">
+      <div className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>

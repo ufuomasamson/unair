@@ -328,7 +328,7 @@ export default function TrackFlightPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-20">
+      <section className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-20">
         <div className="max-w-4xl mx-auto text-center px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Track Your Flight</h1>
           <p className="text-xl mb-8">Enter your tracking number to view flight details and manage your booking</p>
@@ -362,7 +362,7 @@ export default function TrackFlightPage() {
         <section className="py-16">
           <div className="max-w-4xl mx-auto px-4">
             <div className="bg-white rounded-lg shadow-lg p-8">
-              <h2 className="text-3xl font-bold text-[#4f1032] mb-6">Flight Details</h2>
+              <h2 className="text-3xl font-bold text-[#18176b] mb-6">Flight Details</h2>
               
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Flight Information */}
@@ -384,7 +384,7 @@ export default function TrackFlightPage() {
                   
                   {/* Route Information */}
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-bold text-lg text-[#4f1032] mb-4">Route Information</h3>
+                    <h3 className="font-bold text-lg text-[#18176b] mb-4">Route Information</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center">
                         <div>
@@ -402,7 +402,7 @@ export default function TrackFlightPage() {
                   
                   {/* Date and Time */}
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-bold text-lg text-[#4f1032] mb-4">Schedule</h3>
+                    <h3 className="font-bold text-lg text-[#18176b] mb-4">Schedule</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
                         <div className="font-semibold">Date</div>
@@ -416,7 +416,7 @@ export default function TrackFlightPage() {
                   </div>
                   
                   {/* Price */}
-                  <div className="p-4 bg-[#4f1032] text-white rounded-lg">
+                  <div className="p-4 bg-[#18176b] text-white rounded-lg">
                     <div className="text-center">
                       <div className="text-2xl font-bold">${Number(flight.price).toFixed(2)}</div>
                       <div>Total Price</div>
@@ -428,7 +428,7 @@ export default function TrackFlightPage() {
                 <div className="space-y-6">
                   {/* Passenger Information */}
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-bold text-lg text-[#4f1032] mb-4">Passenger Information</h3>
+                    <h3 className="font-bold text-lg text-[#18176b] mb-4">Passenger Information</h3>
                     <div>
                       <div className="font-semibold">Passenger Name</div>
                       <div className="text-gray-600">
@@ -439,7 +439,7 @@ export default function TrackFlightPage() {
                   
                   {/* Booking Status */}
                   <div className="p-4 bg-gray-50 rounded-lg">
-                    <h3 className="font-bold text-lg text-[#4f1032] mb-4">Booking Status</h3>
+                    <h3 className="font-bold text-lg text-[#18176b] mb-4">Booking Status</h3>
                     {booking ? (
                       <div>
                         {/* Status indicator */}
@@ -500,7 +500,7 @@ export default function TrackFlightPage() {
                         <p>No booking found for this flight.</p>
                         <p className="mt-2">Please log in and book this flight to manage your ticket.</p>
                         <button
-                          className="mt-4 w-full bg-[#4f1032] text-white py-3 rounded-lg hover:bg-[#cd7e0f] transition"
+                          className="mt-4 w-full bg-[#18176b] text-white py-3 rounded-lg hover:bg-[#cd7e0f] transition"
                           onClick={handleBookFlight}
                         >
                           Book This Flight
@@ -511,7 +511,7 @@ export default function TrackFlightPage() {
                   
                   {/* Tracking Information */}
                   <div className="p-4 bg-blue-50 rounded-lg">
-                    <h4 className="font-semibold mb-2 text-[#4f1032]">Tracking Information</h4>
+                    <h4 className="font-semibold mb-2 text-[#18176b]">Tracking Information</h4>
                     <div className="text-sm text-gray-600">
                       <p>Tracking Number: <span className="font-mono font-semibold">{flight.tracking_number}</span></p>
                       <p className="mt-2">Use this number to track your flight status anytime.</p>
@@ -521,9 +521,9 @@ export default function TrackFlightPage() {
                   {/* Payment Section for Tracked Flights */}
                   {!booking?.paid && (
                     <div className="space-y-4 mt-6">
-                      <h4 className="font-bold text-lg text-[#4f1032]">Pay For Flight</h4>
+                      <h4 className="font-bold text-lg text-[#18176b]">Pay For Flight</h4>
                       <button
-                        className="w-full bg-[#4f1032] text-white py-3 rounded-lg hover:bg-[#cd7e0f] transition"
+                        className="w-full bg-[#18176b] text-white py-3 rounded-lg hover:bg-[#cd7e0f] transition"
                         onClick={handleOpenWalletsModal}
                       >
                         Pay For Flight
@@ -584,7 +584,7 @@ export default function TrackFlightPage() {
             </div>
             <button
               type="submit"
-              className="w-full bg-[#4f1032] text-white py-2 rounded hover:bg-[#cd7e0f] transition"
+              className="w-full bg-[#18176b] text-white py-2 rounded hover:bg-[#cd7e0f] transition"
               disabled={submittingProof}
             >
               {submittingProof ? "Submitting..." : "Submit Proof"}

@@ -82,7 +82,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
 
   if (loading) {
     return (
-      <nav className="sticky top-0 z-50 bg-[#4f1032] flex items-center justify-between px-8 py-4">
+      <nav className="sticky top-0 z-50 bg-[#18176b] flex items-center justify-between px-8 py-4">
         <Link href="/" className="text-2xl font-bold text-white tracking-tight">Mazol</Link>
         <div className="hidden md:flex gap-8 items-center text-base font-medium">
           <div className="text-white">Loading...</div>
@@ -92,14 +92,14 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
   }
 
   return (
-    <nav className="sticky top-0 z-50 bg-[#4f1032] flex flex-wrap items-center justify-between px-4 sm:px-8 py-4">
+    <nav className="sticky top-0 z-50 bg-[#18176b] flex flex-wrap items-center justify-between px-4 sm:px-8 py-4">
       <Link href="/" className="text-2xl font-bold text-white tracking-tight">United Airline</Link>
       {/* Currency Switcher - always visible */}
       <div className="flex items-center gap-2 w-full justify-center mt-2 md:mt-0 md:w-auto md:justify-end order-3 md:order-none">
         <select
           onChange={(e) => handleCurrencyChange(e.target.value)}
           value={currency}
-          className="bg-[#4f1032] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-sm md:text-base w-32 md:w-auto"
+          className="bg-[#18176b] text-white px-3 py-1 rounded border border-white/20 hover:border-white/40 transition text-sm md:text-base w-32 md:w-auto"
         >
           <option value="USD">$ USD</option>
           <option value="EUR">€ EUR</option>
@@ -146,7 +146,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
         ) : (
           <div className="flex items-center gap-2">
             <Link href="/login" className="ml-4 px-4 py-2 bg-[#cd7e0f] text-white rounded hover:bg-[#cd7e0f]/90 transition">Login</Link>
-            <Link href="/signup" className="ml-2 px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#4f1032] transition">Sign Up</Link>
+            <Link href="/signup" className="ml-2 px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-[#18176b] transition">Sign Up</Link>
           </div>
         )}
       </div>
@@ -164,7 +164,7 @@ export default function Navigation({ user, userRole, currencies }: NavigationPro
       </div>
       {/* Mobile Menu Dropdown */}
       {isMobileMenuOpen && (
-        <div ref={mobileMenuRef} className="absolute top-full left-0 w-full bg-[#4f1032] shadow-lg z-50 flex flex-col items-center py-4 animate-fade-in">
+        <div ref={mobileMenuRef} className="absolute top-full left-0 w-full bg-[#18176b] shadow-lg z-50 flex flex-col items-center py-4 animate-fade-in">
           <Link href="/" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Home</Link>
           <Link href="/about" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>About Us</Link>
           <Link href="/search" className="text-white py-2 w-full text-center hover:bg-[#cd7e0f]" onClick={() => setIsMobileMenuOpen(false)}>Flights</Link>

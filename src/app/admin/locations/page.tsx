@@ -105,8 +105,8 @@ export default function LocationsPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#4f1032] mx-auto mb-4"></div>
-          <p className="text-[#4f1032] font-semibold">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#18176b] mx-auto mb-4"></div>
+          <p className="text-[#18176b] font-semibold">Loading...</p>
         </div>
       </div>
     );
@@ -117,7 +117,7 @@ export default function LocationsPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       {/* Header */}
-      <div className="bg-gradient-to-r from-[#4f1032] to-[#4f1032]/90 text-white py-8">
+      <div className="bg-gradient-to-r from-[#18176b] to-[#18176b]/90 text-white py-8">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div>
@@ -137,7 +137,7 @@ export default function LocationsPage() {
               </button>
               <a
                 href="/admin/dashboard"
-                className="border border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-[#4f1032] transition"
+                className="border border-white text-white px-6 py-2 rounded-lg hover:bg-white hover:text-[#18176b] transition"
               >
                 Back to Dashboard
               </a>
@@ -150,7 +150,7 @@ export default function LocationsPage() {
         {/* Add/Edit Form */}
         {showForm && (
           <div className="bg-white rounded-lg shadow-xl p-8 mb-8">
-            <h2 className="text-2xl font-bold text-[#4f1032] mb-6">
+            <h2 className="text-2xl font-bold text-[#18176b] mb-6">
               {editingId ? "Edit Location" : "Add New Location"}
             </h2>
             
@@ -222,7 +222,7 @@ export default function LocationsPage() {
 
         {/* Locations List */}
         <div className="bg-white rounded-lg shadow-xl p-8">
-          <h2 className="text-2xl font-bold text-[#4f1032] mb-6">All Locations</h2>
+          <h2 className="text-2xl font-bold text-[#18176b] mb-6">All Locations</h2>
           
           {locations.length === 0 ? (
             <div className="text-center py-12">

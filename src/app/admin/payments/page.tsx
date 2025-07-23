@@ -76,7 +76,7 @@ export default function PaymentsApprovalPage() {
             <div key={p.payment_id} className="bg-white rounded-lg shadow-lg p-6 flex flex-col gap-4 border border-gray-100">
               <div className="flex items-center gap-4">
                 <div className="flex-1">
-                  <div className="font-bold text-lg text-[#4f1032]">Passenger: {p.passenger_name}</div>
+                  <div className="font-bold text-lg text-[#18176b]">Passenger: {p.passenger_name}</div>
                   <div className="text-gray-600 text-sm">Flight No: <span className="font-mono">{p.flight_number}</span></div>
                   <div className="text-gray-600 text-sm">Amount: <span className="font-mono">${Number(p.amount).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</span></div>
                   <div className="text-gray-600 text-sm">Status: <span className="font-semibold">

@@ -52,12 +52,12 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <img src={airlineLogo} alt="Airline Logo" style={{ height: '4rem', width: '4rem', objectFit: 'contain' }} />
           <div>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '0.25rem' }}>{airlineName}</div>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#18176b', marginBottom: '0.25rem' }}>{airlineName}</div>
             <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Flight No: {flightNumber}</div>
           </div>
         </div>
         <div style={{ 
-          backgroundColor: '#4f1032', 
+          backgroundColor: '#18176b', 
           color: '#ffffff', 
           padding: '0.5rem 1rem', 
           borderRadius: '9999px', 
@@ -68,7 +68,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
 
       {/* Route Section */}
       <div style={{ marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Route Information</h3>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#18176b', marginBottom: '1rem' }}>Route Information</h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           {/* From Card */}
           <div style={{ 
@@ -83,7 +83,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
             <div style={{ fontWeight: 'bold', color: '#111827', fontSize: '1rem' }}>{departure}</div>
           </div>
           
-          <div style={{ fontSize: '1.5rem', color: '#4f1032', fontWeight: 'bold' }}>→</div>
+          <div style={{ fontSize: '1.5rem', color: '#18176b', fontWeight: 'bold' }}>→</div>
           
           {/* To Card */}
           <div style={{ 
@@ -102,7 +102,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
 
       {/* Passenger Information Cards */}
       <div style={{ marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Passenger Information</h3>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#18176b', marginBottom: '1rem' }}>Passenger Information</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           {/* Passenger Card */}
           <div style={{ 
@@ -152,7 +152,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
 
       {/* Flight Details Cards */}
       <div style={{ marginBottom: '2rem' }}>
-        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#4f1032', marginBottom: '1rem' }}>Flight Details</h3>
+        <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#18176b', marginBottom: '1rem' }}>Flight Details</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           {/* Date Card */}
           <div style={{ 
@@ -184,7 +184,7 @@ const FlightTicket = forwardRef<HTMLDivElement, FlightTicketProps>(({
             padding: '1rem'
           }}>
             <div style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '0.5rem', fontWeight: '600' }}>Tracking</div>
-            <div style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#4f1032', fontWeight: '600' }}>{trackingNumber}</div>
+            <div style={{ fontFamily: 'monospace', fontSize: '1rem', color: '#18176b', fontWeight: '600' }}>{trackingNumber}</div>
           </div>
         </div>
       </div>
